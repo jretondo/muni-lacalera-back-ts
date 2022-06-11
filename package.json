@@ -4,7 +4,12 @@
   "description": "Backend system for La Calera Cityhall, made in TS and Node-Express. This app management providers payment",
   "main": "dist/api/index.js",
   "scripts": {
-    "test": "concurrently \"tsc -w\" \"nodemon dist/api/index.js\""
+    "test": "concurrently \"tsc -w\" \"nodemon dist/api/index.js\"",
+    "start": "pm2 start dist/api/ecosystem.config.js",
+    "stop": "pm2 stop dist/api/ecosystem.config.js",
+    "restart": "pm2 restart dist/api/ecosystem.config.js",
+    "build": "tsc",
+    "purge": "rm -rf dist"
   },
   "keywords": [
     "api",
