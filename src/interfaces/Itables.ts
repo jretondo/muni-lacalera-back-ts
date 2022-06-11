@@ -1,19 +1,26 @@
 export interface Iauth {
     id?: number,
-    usuario: string,
+    user: string,
     pass?: string,
     prov: number
 }
 export interface IUser {
     id?: number,
-    nombre: string,
-    apellido: string
+    name: string,
+    lastname: string
     email: string,
-    usuario: string,
-    telefono: string
+    user: string,
+    tel: string
 }
 export interface IUserPermission {
     id?: number,
     id_user: number,
     id_permission: number
+}
+
+export interface IActivity {
+    id?: number,
+    date?: Date,
+    user_id: number,
+    activity_descr: string
 }

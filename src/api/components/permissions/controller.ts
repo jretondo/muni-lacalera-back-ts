@@ -8,16 +8,16 @@ export = (injectedStore: typeof StoreType) => {
     let store = injectedStore;
 
     const upsert = async (body: INewPermissions) => {
-        if (body.permisos.length > 0) {
+        if (body.permissions.length > 0) {
             await store.remove(Tables.USER_PERMISSIONS, { id_user: body.idUser })
 
-            const headers = [Columns.userPemissions.id_permission, Columns.userPemissions.id_user]
+            const headers = [Columns.userPermissions.id_permission, Columns.userPermissions.id_user]
 
             const permissions: Promise<Array<Array<number>>> = new Promise((resolve, reject) => {
                 let prov: Array<any> = [];
-                body.permisos.map((item, key) => {
-                    prov.push([item.idPermiso, body.idUser]);
-                    if (key === body.permisos.length - 1) {
+                body.permissions.map((item, key) => {
+                    prov.push([item.idPermission, body.idUser]);
+                    if (key === body.permissions.length - 1) {
                         resolve(prov);
                     }
                 })
@@ -29,18 +29,18 @@ export = (injectedStore: typeof StoreType) => {
         }
     }
 
-    const getPermision = async (idUser: number, idPermission: number) => {
+    const getPermission = async (idUser: number, idPermission: number) => {
         let filters: Array<IWhereParams> | undefined = []
         const filter: IWhereParams = {
             mode: EModeWhere.strict,
             concat: EConcatWhere.and,
             items: [
                 {
-                    column: Columns.userPemissions.id_user,
+                    column: Columns.userPermissions.id_user,
                     object: String(idUser)
                 },
                 {
-                    column: Columns.userPemissions.id_permission, object: String(idPermission)
+                    column: Columns.userPermissions.id_permission, object: String(idPermission)
                 }
             ]
         }
@@ -51,7 +51,7 @@ export = (injectedStore: typeof StoreType) => {
     const get2 = async (idUser: number) => {
         const join: IJoinMysql = {
             tableJoin: Tables.PERMISSIONS,
-            columnOrigin: Columns.userPemissions.id_permission,
+            columnOrigin: Columns.userPermissions.id_permission,
             columnJoin: Columns.permissions.id
         }
         let filters: Array<IWhereParams> | undefined = []
@@ -68,31 +68,31 @@ export = (injectedStore: typeof StoreType) => {
         filters.push(filter);
         const allPermissions = await store.list(Tables.PERMISSIONS, ["*"], filters, undefined, undefined, undefined);
 
-        const userPermissions = await store.query(Tables.USER_PERMISSIONS, { id_user: idUser }, join, [Columns.userPemissions.id_permission]);
+        const userPermissions = await store.query(Tables.USER_PERMISSIONS, { id_user: idUser }, join, [Columns.userPermissions.id_permission]);
 
 
-        const permisos: Array<any> = await new Promise((resolve, reject) => {
-            const lista: Array<any> = [];
+        const permissions: Array<any> = await new Promise((resolve, reject) => {
+            const list: Array<any> = [];
             allPermissions.map((item: any, key: number) => {
                 const idPermiso = item.id
                 const found = userPermissions.find((element: any) => element.id_permission === idPermiso)
                 if (!found) {
-                    lista.push(item);
+                    list.push(item);
                 }
                 if (key === allPermissions.length - 1) {
-                    resolve(lista);
+                    resolve(list);
                 }
             });
         })
 
         return {
             userPermissions,
-            permisos
+            permissions
         };
     }
 
     const get = async (idUser: number) => {
-        return await store.query(Tables.USER_PERMISSIONS, { id_user: idUser }, undefined, [Columns.userPemissions.id_permission]);
+        return await store.query(Tables.USER_PERMISSIONS, { id_user: idUser }, undefined, [Columns.userPermissions.id_permission]);
     }
 
     const getPermissions = async () => {
@@ -101,7 +101,7 @@ export = (injectedStore: typeof StoreType) => {
 
     return {
         upsert,
-        getPermision,
+        getPermission,
         get,
         get2,
         getPermissions

@@ -29,7 +29,7 @@ const listPagination = (
 ) => {
     Controller.list(
         Number(req.params.page),
-        String(req.query.query),
+        String(req.query.query?req.query.query:""),
         Number(req.query.cantPerPage),
         Number(req.body.user.id)
     )
@@ -54,7 +54,8 @@ const upsert = (
             if (response) {
                 success({
                     req,
-                    res
+                    res,
+                    status: 201
                 });
             } else {
                 next(response);

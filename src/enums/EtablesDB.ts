@@ -1,15 +1,15 @@
 enum AdminCol {
     id = 'id',
-    nombre = 'nombre',
-    apellido = 'apellido',
+    name = 'name',
+    lastname = 'lastname',
     email = 'email',
-    usuario = 'usuario',
-    telefono = 'telefono'
+    user = 'user',
+    tel = 'tel'
 }
 
 enum AuthAdmCol {
     id = 'id',
-    usuario = 'usuario',
+    user = 'user',
     pass = 'pass',
     prov = 'prov'
 }
@@ -25,20 +25,32 @@ enum Permissions {
     module_name = "module_name"
 }
 
+enum Activity {
+    id = "id",
+    date = "date",
+    user_id = "user_id",
+    activity_descr = "activity_descr"
+}
+
 export enum EPermissions {
-    userAdmin = 0
+    userAdmin = 1,
+    providers = 2,
+    paymentRegister = 3,
+    reports = 4
 }
 
 export enum Tables {
-    ADMIN = "administradores",
+    ADMIN = "admins",
     AUTH_ADMIN = "auth_admin",
     USER_PERMISSIONS = "admin_permissions",
     PERMISSIONS = "permissions",
+    ACTIVITY = "activity"
 }
 
 export const Columns = {
     admin: AdminCol,
     authAdmin: AuthAdmCol,
-    userPemissions: UserPermissionCol,
-    permissions: Permissions
+    userPermissions: UserPermissionCol,
+    permissions: Permissions,
+    activity: Activity
 }

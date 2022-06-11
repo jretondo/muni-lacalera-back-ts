@@ -11,11 +11,9 @@ const upsert = (
     res: Response,
     next: NextFunction
 ) => {
-    Controller.upsert(req.body)
-        .then(() => {
-            success({ res, req, status: 201, message: "Permisos creados!" })
-        })
-        .catch(next)
+    Controller.upsert(req.body).then(() => {
+            success({ res, req, status: 201, message: "permissions creados!" })
+        }).catch(next)
 }
 
 const get = (
@@ -23,11 +21,9 @@ const get = (
     res: Response,
     next: NextFunction
 ) => {
-    Controller.get(req.body.user.id)
-        .then((permisos: any) => {
-            success({ req, res, message: permisos })
-        })
-        .catch(next)
+    Controller.get(req.body.user.id).then((permissions: any) => {
+            success({ req, res, message: permissions })
+        }).catch(next)
 }
 
 const getOther = (
@@ -35,11 +31,9 @@ const getOther = (
     res: Response,
     next: NextFunction
 ) => {
-    Controller.get2(Number(req.params.id))
-        .then((permisos: any) => {
-            success({ req, res, message: permisos })
-        })
-        .catch(next)
+    Controller.get2(Number(req.params.id)).then((permissions: any) => {
+            success({ req, res, message: permissions })
+        }).catch(next)
 }
 
 const getPermissions = (
@@ -47,18 +41,16 @@ const getPermissions = (
     res: Response,
     next: NextFunction
 ) => {
-    Controller.getPermissions()
-        .then((permisos: any) => {
-            success({ req, res, message: permisos })
-        })
-        .catch(next)
+    Controller.getPermissions().then((permissions: any) => {
+            success({ req, res, message: permissions })
+        }).catch(next)
 }
 
 //Routes
 router.post("/", secure(EPermissions.userAdmin), upsert);
 router.put("/", secure(EPermissions.userAdmin), upsert);
-router.get("/", secure(), get);
 router.get("/list", secure(EPermissions.userAdmin), getPermissions);
 router.get("/:id", secure(EPermissions.userAdmin), getOther)
+router.get("/", secure(), get);
 
 export = router;

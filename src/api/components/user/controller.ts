@@ -10,17 +10,18 @@ export = (injectedStore: typeof StoreType) => {
     let store = injectedStore;
 
     const list = async (page?: number, item?: string, cantPerPage?: number, idUsu?: number) => {
-
+  
         const filters: Array<IWhereParams> | undefined = [];
         if (item) {
             const filter: IWhereParams | undefined = {
                 mode: EModeWhere.like,
                 concat: EConcatWhere.or,
                 items: [
-                    { column: Columns.admin.apellido, object: String(item) },
+                    { column: Columns.admin.lastname, object: String(item) },
                     { column: Columns.admin.email, object: String(item) },
-                    { column: Columns.admin.nombre, object: String(item) },
-                    { column: Columns.admin.usuario, object: String(item) }
+                    { column: Columns.admin.name, object: String(item) },
+                    { column: Columns.admin.user, object: String(item) },
+                    { column: Columns.admin.tel, object: String(item) },
                 ]
             };
             filters.push(filter);
@@ -62,11 +63,11 @@ export = (injectedStore: typeof StoreType) => {
 
     const upsert = async (body: IUser) => {
         const user: IUser = {
-            nombre: body.nombre,
-            apellido: body.apellido,
+            name: body.name,
+            lastname: body.lastname,
             email: body.email,
-            usuario: body.usuario,
-            telefono: body.telefono
+            user: body.user,
+            tel: body.tel
         }
 
         if (body.id) {
@@ -75,7 +76,7 @@ export = (injectedStore: typeof StoreType) => {
             const result = await store.insert(Tables.ADMIN, user);
             const newAuth: Iauth = {
                 id: result.insertId,
-                usuario: user.usuario,
+                user: user.user,
                 prov: 1
             }
             return await Authcontroller.upsert(newAuth, body.email);

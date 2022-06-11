@@ -33,7 +33,7 @@ export const sendPass = async (
             Links,
             Names,
             titlePage: subject,
-            titleHead: "Hola Retondo Javier",
+            titleHead: "Hola " + user,
             parrafosHead: welcome,
             titleButton: "A continuación le pasamos los datos de ingreso al mismo:",
             textCall: `Usuario: ${user}`,

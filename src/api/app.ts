@@ -15,7 +15,7 @@ import auth from './components/auth/network';
 import permissions from './components/permissions/network';
 import user from './components/user/network';
 import routes from './components/routes/network';
-
+import activity from './components/activity/network';
 export class App {
     app: Application;
     constructor(
@@ -47,6 +47,7 @@ export class App {
         this.app.use("/api/permissions", permissions)
         this.app.use("/api/user", user)
         this.app.use("/api/routes", routes)
+        this.app.use("/api/activity", activity)
         this.app.use(errorTrhow);
     }
 

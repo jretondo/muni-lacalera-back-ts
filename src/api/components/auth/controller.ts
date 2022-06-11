@@ -13,14 +13,14 @@ export = (injectedStore: typeof StoreType) => {
         let newAuth: Iauth;
         if (body.pass) {
             newAuth = {
-                usuario: body.usuario,
+                user: body.user,
                 prov: body.prov,
                 pass: await bcrypt.hash(body.pass, 5)
             };
             if (body.prov === 1) {
                 const result = await store.update(Tables.AUTH_ADMIN, newAuth, Number(body.id));
                 if (result.affectedRows > 0) {
-                    return await sendPass(body.usuario, body.pass, email, "Nueva contraseña", false, false);
+                    return await sendPass(body.user, body.pass, email, "Nueva contraseña", false, false);
                 } else {
                     return false;
                 }
@@ -31,13 +31,13 @@ export = (injectedStore: typeof StoreType) => {
             const newPass = await passCreator();
             newAuth = {
                 id: body.id,
-                usuario: body.usuario,
+                user: body.user,
                 prov: 1,
                 pass: await bcrypt.hash(newPass, 5)
             };
             const result = await store.insert(Tables.AUTH_ADMIN, newAuth);
             if (result.affectedRows > 0) {
-                return await sendPass(body.usuario, newPass, email, "Nuevo Usuario", true, false);
+                return await sendPass(body.user, newPass, email, "Nuevo usuario", true, false);
             } else {
                 return false;
             }
@@ -45,15 +45,13 @@ export = (injectedStore: typeof StoreType) => {
     }
 
     const recPass = async (email: string) => {
-        console.log('email', email);
         const newPass = await passCreator();
         const userData = await store.query(Tables.ADMIN, { email: email });
-        console.log('userData', userData);
         const idUsu = userData[0].id;
-        const usuario = userData[0].usuario;
+        const user = userData[0].user;
         const data: Iauth = {
             id: idUsu,
-            usuario: usuario,
+            user: user,
             prov: 1,
             pass: newPass
         };
@@ -62,8 +60,8 @@ export = (injectedStore: typeof StoreType) => {
     }
 
     const login = async (username: string, password: string) => {
-        const data3 = await store.query(Tables.AUTH_ADMIN, { usuario: username })
-        const data2 = await store.query(Tables.ADMIN, { usuario: username })
+        const data3 = await store.query(Tables.AUTH_ADMIN, { user: username })
+        const data2 = await store.query(Tables.ADMIN, { user: username })
         const userData = data2[0]
         const data = {
             ...data2[0],

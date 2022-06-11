@@ -1,10 +1,10 @@
 export interface INewPermissions {
-    permisos: Array<INewPermission>,
+    permissions: Array<INewPermission>,
     idUser: number
 }
 
 export interface INewPermission {
-    idPermiso: number
+    id_permission: number
 }
 
 export interface INewInsert {

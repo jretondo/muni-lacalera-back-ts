@@ -1,16 +1,16 @@
 export interface INewUser {
     id?: number,
-    nombre: string,
-    apellido: string
+    name: string,
+    lastname: string
     email: string,
-    usuario: string,
-    telefono: string
+    user: string,
+    tel: string
 }
 export interface INewPermissions {
-    permisos: Array<INewPermission>,
+    permissions: Array<INewPermission>,
     idUser: number
 }
 
 export interface INewPermission {
-    idPermiso: number
+    idPermission: number
 }
