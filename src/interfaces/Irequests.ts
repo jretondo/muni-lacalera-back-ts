@@ -3,7 +3,7 @@ export interface INewUser {
     name: string,
     lastname: string
     email: string,
-    user: string,
+    userName: string,
     tel: string
 }
 export interface INewPermissions {

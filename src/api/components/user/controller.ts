@@ -1,3 +1,4 @@
+import { INewUser } from './../../../interfaces/Irequests';
 import { Ipages, IWhereParams } from 'interfaces/Ifunctions';
 import { Iauth, IUser } from 'interfaces/Itables';
 import { EConcatWhere, EModeWhere, ESelectFunct } from '../../../enums/EfunctMysql';
@@ -61,14 +62,13 @@ export = (injectedStore: typeof StoreType) => {
         }
     }
 
-    const upsert = async (body: IUser) => {
-        console.log('body :>> ', body);
+    const upsert = async (body: INewUser) => {
 
         const user: IUser = {
             name: body.name,
             lastname: body.lastname,
             email: body.email,
-            user: body.user,
+            user: body.userName,
             tel: body.tel
         }
 
