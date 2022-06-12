@@ -10,7 +10,7 @@ export = (injectedStore: typeof StoreType) => {
     let store = injectedStore;
 
     const list = async (page?: number, item?: string, cantPerPage?: number, idUsu?: number) => {
-  
+
         const filters: Array<IWhereParams> | undefined = [];
         if (item) {
             const filter: IWhereParams | undefined = {
@@ -62,6 +62,8 @@ export = (injectedStore: typeof StoreType) => {
     }
 
     const upsert = async (body: IUser) => {
+        console.log('body :>> ', body);
+
         const user: IUser = {
             name: body.name,
             lastname: body.lastname,
