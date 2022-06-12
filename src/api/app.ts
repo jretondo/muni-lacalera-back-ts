@@ -11,6 +11,7 @@ dotenv.config({
 
 import { errorTrhow } from '../network/errors';
 
+import test from './components/test';
 import auth from './components/auth/network';
 import permissions from './components/permissions/network';
 import user from './components/user/network';
@@ -43,6 +44,7 @@ export class App {
 
     private routes() {
         this.app.use("/static", express.static(path.join(__dirname, "..", "..", "public")));
+        this.app.use('/api', test);
         this.app.use("/api/auth", auth)
         this.app.use("/api/permissions", permissions)
         this.app.use("/api/user", user)
