@@ -9,8 +9,10 @@ const responseSuccess = (req: Request, res: Response, next: NextFunction) => {
 }
 
 //Routes
-router.get("/dashboard", secure(), responseSuccess)
+router
+    .get("/dashboard", secure(), responseSuccess)
     .get("/changePass", secure(), responseSuccess)
     .get("/userAdmin", secure(EPermissions.userAdmin), responseSuccess)
+    .get("/providers", secure(EPermissions.providers), responseSuccess)
 
 export = router;
