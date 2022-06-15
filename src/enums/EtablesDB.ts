@@ -32,6 +32,37 @@ enum Activity {
     activity_descr = "activity_descr"
 }
 
+enum Providers {
+    id = "id",
+    name = "name",
+    sector_id = "sector_id",
+    dni = "dni",
+    cuit = "cuit",
+    direction = "direction",
+    prof_numb = "prof_numb",
+    is_professional = "is_professional",
+    is_health_prof = "is_health_prof",
+    hours = "hours",
+    month_amount = "month_amount",
+    amount_id = "amount_id",
+    created = "created",
+    updated = "updated"
+}
+
+enum Sectors {
+    id = "id",
+    sector = "sector",
+    description = "description"
+}
+
+enum Amounts {
+    id = "id",
+    name = "name",
+    amount = "amount",
+    per_hour = "per_hour",
+    description = "description"
+}
+
 export enum EPermissions {
     userAdmin = 1,
     providers = 2,
@@ -44,7 +75,10 @@ export enum Tables {
     AUTH_ADMIN = "auth_admin",
     USER_PERMISSIONS = "admin_permissions",
     PERMISSIONS = "permissions",
-    ACTIVITY = "activity"
+    ACTIVITY = "activity",
+    PROVIDERS = "providers",
+    SECTORS = "sectors",
+    AMOUNTS = "amounts"
 }
 
 export const Columns = {
@@ -52,5 +86,8 @@ export const Columns = {
     authAdmin: AuthAdmCol,
     userPermissions: UserPermissionCol,
     permissions: Permissions,
-    activity: Activity
+    activity: Activity,
+    providers: Providers,
+    sectors: Sectors,
+    amounts: Amounts
 }
