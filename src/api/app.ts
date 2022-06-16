@@ -17,6 +17,8 @@ import permissions from './components/permissions/network';
 import user from './components/user/network';
 import routes from './components/routes/network';
 import activity from './components/activity/network';
+import providers from './components/providers/network';
+import sectors from './components/sectors/network';
 export class App {
     app: Application;
     constructor(
@@ -50,6 +52,8 @@ export class App {
         this.app.use("/api/user", user)
         this.app.use("/api/routes", routes)
         this.app.use("/api/activity", activity)
+        this.app.use("/api/providers", providers)
+        this.app.use("/api/sectors", sectors)
         this.app.use(errorTrhow);
     }
 

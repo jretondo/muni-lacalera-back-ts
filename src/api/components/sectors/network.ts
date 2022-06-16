@@ -1,4 +1,4 @@
-import { EPermissions } from './../../../enums/EtablesDB';
+import { EPermissions } from '../../../enums/EtablesDB';
 import { Router, NextFunction, Response, Request } from 'express';
 import { success } from '../../../network/response';
 const router = Router();
@@ -13,7 +13,8 @@ const list = (
     Controller.list(undefined, req.body.query)
         .then((listData: any) => {
             success({ req, res, status: 200, message: listData });
-        }).catch(next)
+        })
+        .catch(next)
 };
 
 const listPagination = (
@@ -24,14 +25,12 @@ const listPagination = (
     Controller.list(
         Number(req.params.page),
         Number(req.query.cantPerPage),
-        String(req.query.query ? req.query.query : ""),
-        Number(req.query.sectorId),
-        Boolean(req.query.isProf),
-        Boolean(req.query.isHealthProf)
+        String(req.query.query ? req.query.query : "")
     )
         .then((listData: any) => {
             success({ req, res, status: 200, message: listData });
-        }).catch(next)
+        })
+        .catch(next)
 };
 
 const upsert = (
@@ -46,7 +45,8 @@ const upsert = (
             } else {
                 next(response);
             }
-        }).catch(next)
+        })
+        .catch(next)
 }
 
 const remove = (
@@ -57,7 +57,8 @@ const remove = (
     Controller.remove(Number(req.params.id))
         .then(() => {
             success({ req, res });
-        }).catch(next)
+        })
+        .catch(next)
 }
 
 const get = (
@@ -68,23 +69,12 @@ const get = (
     Controller.getUser(Number(req.params.id))
         .then((data) => {
             success({ req, res, message: data });
-        }).catch(next)
-}
-
-const getDataFiscal = (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    Controller.getDataFiscal(Number(req.query.cuit))
-        .then((data) => {
-            success({ req, res, message: data });
-        }).catch(next)
+        })
+        .catch(next)
 }
 
 router
     .get("/details/:id", secure(EPermissions.providers), get)
-    .get("/fiscal", secure(EPermissions.providers), getDataFiscal)
     .get("/:page", secure(EPermissions.providers), listPagination)
     .get("/", secure(EPermissions.providers), list)
     .post("/", secure(EPermissions.providers), upsert)

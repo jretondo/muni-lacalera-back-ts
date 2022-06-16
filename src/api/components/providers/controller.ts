@@ -1,16 +1,17 @@
+import { INewInsert } from './../../../interfaces/Iresponses';
+import { IProviders } from './../../../interfaces/Itables';
 import { INewUser } from './../../../interfaces/Irequests';
 import { Ipages, IWhereParams } from 'interfaces/Ifunctions';
-import { Iauth, IUser } from 'interfaces/Itables';
 import { EConcatWhere, EModeWhere, ESelectFunct } from '../../../enums/EfunctMysql';
 import { Tables, Columns } from '../../../enums/EtablesDB';
 import StoreType from '../../../store/mysql';
 import getPages from '../../../utils/functions/getPages';
-import Authcontroller from '../auth/index';
+import { AfipClass } from '../../../utils/classes/AfipClass';
 
 export = (injectedStore: typeof StoreType) => {
     let store = injectedStore;
 
-    const list = async (page?: number, item?: string, cantPerPage?: number, sectorId?: number, isProf?: boolean, isHealthProf?: boolean) => {
+    const list = async (page?: number, cantPerPage?: number, item?: string, sectorId?: number, isProf?: boolean, isHealthProf?: boolean) => {
 
         const filters: Array<IWhereParams> | undefined = [];
         if (item) {
@@ -25,6 +26,30 @@ export = (injectedStore: typeof StoreType) => {
                 ]
             };
             filters.push(filter);
+        }
+        if (sectorId) {
+            filters.push({
+                mode: EModeWhere.strict,
+                concat: EConcatWhere.and,
+                items: [
+                    { column: Columns.providers.sector_id, object: String(sectorId) }]
+            })
+        }
+        if (isProf) {
+            filters.push({
+                mode: EModeWhere.strict,
+                concat: EConcatWhere.and,
+                items: [
+                    { column: Columns.providers.is_professional, object: String(isProf) }]
+            })
+        }
+        if (isHealthProf) {
+            filters.push({
+                mode: EModeWhere.strict,
+                concat: EConcatWhere.and,
+                items: [
+                    { column: Columns.providers.is_health_prof, object: String(isHealthProf) }]
+            })
         }
 
         let pages: Ipages;
@@ -50,48 +75,51 @@ export = (injectedStore: typeof StoreType) => {
         }
     }
 
-    const upsert = async (body: INewUser) => {
-
-        const user: IUser = {
-            name: body.name,
-            lastname: body.lastname,
-            email: body.email,
-            user: body.userName,
-            tel: body.tel
-        }
-
+    const upsert = async (body: IProviders) => {
         if (body.id) {
-            return await store.update(Tables.ADMIN, user, body.id);
-        } else {
-            const result = await store.insert(Tables.ADMIN, user);
-            const newAuth: Iauth = {
-                id: result.insertId,
-                user: user.user,
-                prov: 1
+            const resInsert: INewInsert = await store.update(Tables.PROVIDERS, body, body.id);
+            if (resInsert.affectedRows > 0) {
+                return "ok"
+            } else {
+                throw new Error(resInsert.message)
             }
-            return await Authcontroller.upsert(newAuth, body.email);
+        } else {
+            const resInsert: INewInsert = await store.insert(Tables.PROVIDERS, body);
+            if (resInsert.affectedRows > 0) {
+                return "ok"
+            } else {
+                throw new Error(resInsert.message)
+            }
         }
     }
 
-    const remove = async (idUser: number) => {
-        await store.remove(Tables.ADMIN, { id: idUser })
-            .then(async (result: any) => {
-                if (result.affectedRows > 0) {
-                    await store.remove(Tables.AUTH_ADMIN, { id: idUser })
-                } else {
-                    throw new Error();
-                }
-            })
+    const remove = async (idProv: number) => {
+        const resInsert: INewInsert = await store.remove(Tables.PROVIDERS, { id: idProv })
+        if (resInsert.affectedRows > 0) {
+            return "ok"
+        } else {
+            throw new Error(resInsert.message)
+        }
     }
 
-    const getUser = async (idUser: number): Promise<Array<IUser>> => {
-        return await store.get(Tables.ADMIN, idUser);
+    const getUser = async (idProv: number): Promise<Array<IProviders>> => {
+        return await store.get(Tables.PROVIDERS, idProv);
+    }
+
+    const getDataFiscal = async (cuit: number) => {
+        const certDir = "jretondo.crt"
+        const keyDir = "jretondo.key"
+
+        const afip = new AfipClass(20350925148, certDir, keyDir, true);
+        const dataFiscal = await afip.getDataCUIT(cuit);
+        return dataFiscal
     }
 
     return {
         list,
         upsert,
         remove,
-        getUser
+        getUser,
+        getDataFiscal
     }
 }

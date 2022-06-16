@@ -88,7 +88,7 @@ const update = async (
     })
 }
 
-const remove = async (table: Tables, data: object) => {
+const remove = async (table: Tables, data: object): Promise<any> => {
     return new Promise((resolve, reject) => {
         connection.query(` DELETE FROM ${table} WHERE ? `, [data], (err: Error, result: any) => {
             if (err) {
