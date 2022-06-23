@@ -52,6 +52,8 @@ export interface IProviders {
     hours: number,
     month_amount: number,
     amount_id: number,
+    category: string,
+    activity: string,
     created?: Date,
     updated?: Date
 }

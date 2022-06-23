@@ -31,7 +31,7 @@ export = (injectedStore: typeof StoreType) => {
             pages = {
                 currentPage: page,
                 cantPerPage: cantPerPage || 10,
-                order: Columns.providers.name,
+                order: Columns.sectors.sector,
                 asc: true
             };
             const data = await store.list(Tables.SECTORS, [ESelectFunct.all], filters, undefined, pages);
