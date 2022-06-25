@@ -11,37 +11,37 @@ export = (injectedStore: typeof StoreType) => {
     let store = injectedStore;
 
     const list = async (page?: number, cantPerPage?: number, item?: string, type?: number) => {
-
+        console.log('type :>> ', type);
         const filters: Array<IWhereParams> | undefined = [];
         if (item) {
             const filter: IWhereParams | undefined = {
                 mode: EModeWhere.like,
                 concat: EConcatWhere.or,
                 items: [
-                    { column: Columns.amounts.name, object: String(item) },
+                    { column: Columns.amounts.amount_name, object: String(item) },
                     { column: Columns.amounts.description, object: String(item) },
                     { column: Columns.amounts.id, object: String(item) }
                 ]
             };
             filters.push(filter);
         }
-        if (type) {
-            const filter2: IWhereParams | undefined = {
-                mode: EModeWhere.strict,
-                concat: EConcatWhere.and,
-                items: [
-                    { column: Columns.amounts.per_hour, object: String(type) }
-                ]
-            };
-            filters.push(filter2);
-        }
+
+        const filter2: IWhereParams | undefined = {
+            mode: EModeWhere.strict,
+            concat: EConcatWhere.and,
+            items: [
+                { column: Columns.amounts.per_hour, object: String(type) }
+            ]
+        };
+        filters.push(filter2);
+
 
         let pages: Ipages;
         if (page) {
             pages = {
                 currentPage: page,
                 cantPerPage: cantPerPage || 10,
-                order: Columns.amounts.name,
+                order: Columns.amounts.amount_name,
                 asc: true
             };
             const data = await store.list(Tables.AMOUNTS, [ESelectFunct.all], filters, undefined, pages);
@@ -61,7 +61,7 @@ export = (injectedStore: typeof StoreType) => {
 
     const upsert = async (body: IAmounts) => {
         const amount: IAmounts = {
-            name: body.name,
+            amount_name: body.amount_name,
             amount: body.amount,
             per_hour: body.per_hour,
             description: body.description

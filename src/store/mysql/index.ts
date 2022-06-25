@@ -75,10 +75,11 @@ const mInsert = async (
 const update = async (
     table: Tables,
     data: object,
-    id: number
+    id: number,
+    idCustom?: string | "id"
 ): Promise<any> => {
     return new Promise((resolve, reject) => {
-        connection.query(` UPDATE ${table} SET ? WHERE id = ? `, [data, id], (err: Error, result: any) => {
+        connection.query(` UPDATE ${table} SET ? WHERE ${idCustom} = ? `, [data, id], (err: Error, result: any) => {
             if (err) {
                 reject(err)
             } else {
@@ -157,7 +158,7 @@ const list = (
     whereParams?: Array<IWhereParams>,
     groupBy?: Array<string>,
     pages?: Ipages,
-    join?: IJoin,
+    join?: Array<IJoin>,
     order?: Iorder
 ): Promise<any> => {
     const query = selectContructor(table, colSelect, whereParams, groupBy, pages, join, order);

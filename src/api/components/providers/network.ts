@@ -25,9 +25,9 @@ const listPagination = (
         Number(req.params.page),
         Number(req.query.cantPerPage),
         String(req.query.query ? req.query.query : ""),
-        Number(req.query.sectorId),
-        Boolean(req.query.isProf),
-        Boolean(req.query.isHealthProf)
+        String(req.query.sectorId),
+        String(req.query.isProf),
+        String(req.query.isHealthProf)
     )
         .then((listData: any) => {
             success({ req, res, status: 200, message: listData });

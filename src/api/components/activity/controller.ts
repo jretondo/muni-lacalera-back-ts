@@ -16,13 +16,13 @@ export = (injectedStore: typeof StoreType) => {
         const newActivity: IActivity = {
             user_id: user.id || 0,
             activity_descr: activityDescr
-        } 
+        }
         const resp: INewInsert = await store.insert(Tables.ACTIVITY, newActivity)
-        if(resp.affectedRows>0){
+        if (resp.affectedRows > 0) {
             return {
-               responseInsert: resp 
+                responseInsert: resp
             }
-        }else{
+        } else {
             throw Error("Error al insertar nueva actividad")
         }
     }
@@ -39,7 +39,7 @@ export = (injectedStore: typeof StoreType) => {
             };
             filters.push(filter);
         }
-        if(dateFrom){
+        if (dateFrom) {
             const filter: IWhereParams | undefined = {
                 mode: EModeWhere.higherEqual,
                 concat: EConcatWhere.and,
@@ -49,7 +49,7 @@ export = (injectedStore: typeof StoreType) => {
             };
             filters.push(filter);
         }
-        if(dateTo){
+        if (dateTo) {
             const filter: IWhereParams | undefined = {
                 mode: EModeWhere.lessEqual,
                 concat: EConcatWhere.and,
@@ -70,20 +70,20 @@ export = (injectedStore: typeof StoreType) => {
         if (page) {
             pages = {
                 currentPage: page,
-                cantPerPage:  5,
+                cantPerPage: 5,
                 order: Columns.activity.date,
                 asc: false
             };
-            const data = await store.list(Tables.ACTIVITY, [ESelectFunct.all], filters, undefined, pages,joinUser);
+            const data = await store.list(Tables.ACTIVITY, [ESelectFunct.all], filters, undefined, pages, [joinUser]);
             const cant = await store.list(Tables.ACTIVITY, [`COUNT(${ESelectFunct.all}) AS COUNT`], filters, undefined, undefined);
             const pagesObj = await getPages(cant[0].COUNT, 5, Number(page));
-            
+
             return {
                 data,
                 pagesObj
             };
         } else {
-            const data = await store.list(Tables.ACTIVITY, [ESelectFunct.all], filters, undefined, undefined,joinUser);          
+            const data = await store.list(Tables.ACTIVITY, [ESelectFunct.all], filters, undefined, undefined, [joinUser]);
             return {
                 data
             };

@@ -25,5 +25,5 @@ export enum ESelectFunct {
 export enum ETypesJoin {
     left = "LEFT",
     right = "RIGHT",
-    none = ""
+    none = "INNER"
 }

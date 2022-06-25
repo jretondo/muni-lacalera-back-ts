@@ -27,7 +27,7 @@ export interface IActivity {
 
 export interface IAmounts {
     id?: number,
-    name: string,
+    amount_name: string,
     amount: number,
     per_hour: boolean,
     description: string
@@ -40,7 +40,7 @@ export interface ISectors {
 }
 
 export interface IProviders {
-    id?: number,
+    id_provider?: number,
     name: string,
     sector_id: number,
     dni: string,
@@ -54,6 +54,8 @@ export interface IProviders {
     amount_id: number,
     category: string,
     activity: string,
+    email: string,
+    phone: string,
     created?: Date,
     updated?: Date
 }

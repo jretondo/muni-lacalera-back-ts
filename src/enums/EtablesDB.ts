@@ -33,7 +33,7 @@ enum Activity {
 }
 
 enum Providers {
-    id = "id",
+    id_provider = "id_provider",
     name = "name",
     sector_id = "sector_id",
     dni = "dni",
@@ -45,6 +45,8 @@ enum Providers {
     hours = "hours",
     month_amount = "month_amount",
     amount_id = "amount_id",
+    email = "email",
+    phone = "phone",
     created = "created",
     updated = "updated"
 }
@@ -57,7 +59,7 @@ enum Sectors {
 
 enum Amounts {
     id = "id",
-    name = "name",
+    amount_name = "amount_name",
     amount = "amount",
     per_hour = "per_hour",
     description = "description"

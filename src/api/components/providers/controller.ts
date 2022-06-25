@@ -1,8 +1,9 @@
+import { IJoin } from './../../../interfaces/Ifunctions';
 import { INewInsert } from './../../../interfaces/Iresponses';
 import { IProviders } from './../../../interfaces/Itables';
 import { INewUser } from './../../../interfaces/Irequests';
 import { Ipages, IWhereParams } from 'interfaces/Ifunctions';
-import { EConcatWhere, EModeWhere, ESelectFunct } from '../../../enums/EfunctMysql';
+import { EConcatWhere, EModeWhere, ESelectFunct, ETypesJoin } from '../../../enums/EfunctMysql';
 import { Tables, Columns } from '../../../enums/EtablesDB';
 import StoreType from '../../../store/mysql';
 import getPages from '../../../utils/functions/getPages';
@@ -11,8 +12,7 @@ import { AfipClass } from '../../../utils/classes/AfipClass';
 export = (injectedStore: typeof StoreType) => {
     let store = injectedStore;
 
-    const list = async (page?: number, cantPerPage?: number, item?: string, sectorId?: number, isProf?: boolean, isHealthProf?: boolean) => {
-
+    const list = async (page?: number, cantPerPage?: number, item?: string, sectorId?: String, isProf?: String, isHealthProf?: String) => {
         const filters: Array<IWhereParams> | undefined = [];
         if (item) {
             const filter: IWhereParams | undefined = {
@@ -27,7 +27,7 @@ export = (injectedStore: typeof StoreType) => {
             };
             filters.push(filter);
         }
-        if (sectorId) {
+        if (sectorId !== "undefined") {
             filters.push({
                 mode: EModeWhere.strict,
                 concat: EConcatWhere.and,
@@ -35,7 +35,7 @@ export = (injectedStore: typeof StoreType) => {
                     { column: Columns.providers.sector_id, object: String(sectorId) }]
             })
         }
-        if (isProf) {
+        if (isProf !== "undefined") {
             filters.push({
                 mode: EModeWhere.strict,
                 concat: EConcatWhere.and,
@@ -43,13 +43,27 @@ export = (injectedStore: typeof StoreType) => {
                     { column: Columns.providers.is_professional, object: String(isProf) }]
             })
         }
-        if (isHealthProf) {
+        //console.log('isHealthProf :>> ', isHealthProf);
+        if (isHealthProf !== "undefined") {
             filters.push({
                 mode: EModeWhere.strict,
                 concat: EConcatWhere.and,
                 items: [
                     { column: Columns.providers.is_health_prof, object: String(isHealthProf) }]
             })
+        }
+
+        const join1: IJoin = {
+            type: ETypesJoin.none,
+            colOrigin: Columns.providers.sector_id,
+            colJoin: Columns.sectors.id,
+            table: Tables.SECTORS
+        }
+        const join2: IJoin = {
+            type: ETypesJoin.none,
+            colOrigin: Columns.providers.amount_id,
+            colJoin: Columns.amounts.id,
+            table: Tables.AMOUNTS
         }
 
         let pages: Ipages;
@@ -60,15 +74,15 @@ export = (injectedStore: typeof StoreType) => {
                 order: Columns.providers.name,
                 asc: true
             };
-            const data = await store.list(Tables.PROVIDERS, [ESelectFunct.all], filters, undefined, pages);
-            const cant = await store.list(Tables.PROVIDERS, [`COUNT(${ESelectFunct.all}) AS COUNT`], filters, undefined, undefined);
+            const data = await store.list(Tables.PROVIDERS, [ESelectFunct.all], filters, undefined, pages, [join1, join2]);
+            const cant = await store.list(Tables.PROVIDERS, [`COUNT(${ESelectFunct.all}) AS COUNT`], filters);
             const pagesObj = await getPages(cant[0].COUNT, 10, Number(page));
             return {
                 data,
                 pagesObj
             };
         } else {
-            const data = await store.list(Tables.PROVIDERS, [ESelectFunct.all], filters, undefined, undefined);
+            const data = await store.list(Tables.PROVIDERS, [ESelectFunct.all], filters, undefined, undefined, [join1, join2]);
             return {
                 data
             };
@@ -76,15 +90,33 @@ export = (injectedStore: typeof StoreType) => {
     }
 
     const upsert = async (body: IProviders) => {
-        if (body.id) {
-            const resInsert: INewInsert = await store.update(Tables.PROVIDERS, body, body.id);
+        const provider: IProviders = {
+            name: body.name,
+            sector_id: body.sector_id,
+            dni: body.dni,
+            cuit: body.cuit,
+            direction: body.direction,
+            prof_numb: body.prof_numb,
+            is_professional: body.is_professional,
+            is_health_prof: body.is_health_prof,
+            hours: body.hours,
+            month_amount: body.month_amount,
+            amount_id: body.amount_id,
+            category: body.category,
+            activity: body.activity,
+            email: body.email,
+            phone: body.phone
+        }
+
+        if (body.id_provider) {
+            const resInsert: INewInsert = await store.update(Tables.PROVIDERS, provider, body.id_provider, Columns.providers.id_provider);
             if (resInsert.affectedRows > 0) {
                 return "ok"
             } else {
                 throw new Error(resInsert.message)
             }
         } else {
-            const resInsert: INewInsert = await store.insert(Tables.PROVIDERS, body);
+            const resInsert: INewInsert = await store.insert(Tables.PROVIDERS, provider);
             if (resInsert.affectedRows > 0) {
                 return "ok"
             } else {
@@ -103,7 +135,8 @@ export = (injectedStore: typeof StoreType) => {
     }
 
     const getUser = async (idProv: number): Promise<Array<IProviders>> => {
-        return await store.get(Tables.PROVIDERS, idProv);
+        console.log('idProv :>> ', idProv);
+        return await store.getAnyCol(Tables.PROVIDERS, { id_provider: idProv });
     }
 
     const getDataFiscal = async (cuit: number) => {
