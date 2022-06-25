@@ -25,7 +25,8 @@ const listPagination = (
     Controller.list(
         Number(req.params.page),
         Number(req.query.cantPerPage),
-        String(req.query.query ? req.query.query : "")
+        String(req.query.query ? req.query.query : ""),
+        Number(req.query.type)
     )
         .then((listData: any) => {
             success({ req, res, status: 200, message: listData });

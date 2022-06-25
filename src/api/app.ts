@@ -19,6 +19,7 @@ import routes from './components/routes/network';
 import activity from './components/activity/network';
 import providers from './components/providers/network';
 import sectors from './components/sectors/network';
+import amounts from './components/amount/network';
 export class App {
     app: Application;
     constructor(
@@ -54,6 +55,7 @@ export class App {
         this.app.use("/api/activity", activity)
         this.app.use("/api/providers", providers)
         this.app.use("/api/sectors", sectors)
+        this.app.use("/api/amounts", amounts)
         this.app.use(errorTrhow);
     }
 

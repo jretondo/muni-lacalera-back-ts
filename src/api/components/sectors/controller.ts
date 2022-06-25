@@ -1,11 +1,11 @@
-import { INewUser } from '../../../interfaces/Irequests';
+import { INewInsert } from './../../../interfaces/Iresponses';
+import { ISectors } from './../../../interfaces/Itables';
 import { Ipages, IWhereParams } from 'interfaces/Ifunctions';
-import { Iauth, IUser } from 'interfaces/Itables';
+import { IUser } from 'interfaces/Itables';
 import { EConcatWhere, EModeWhere, ESelectFunct } from '../../../enums/EfunctMysql';
 import { Tables, Columns } from '../../../enums/EtablesDB';
 import StoreType from '../../../store/mysql';
 import getPages from '../../../utils/functions/getPages';
-import Authcontroller from '../auth/index';
 
 export = (injectedStore: typeof StoreType) => {
     let store = injectedStore;
@@ -20,7 +20,7 @@ export = (injectedStore: typeof StoreType) => {
                 items: [
                     { column: Columns.sectors.sector, object: String(item) },
                     { column: Columns.sectors.description, object: String(item) },
-                    { column: Columns.providers.id, object: String(item) }
+                    { column: Columns.sectors.id, object: String(item) }
                 ]
             };
             filters.push(filter);
@@ -36,7 +36,7 @@ export = (injectedStore: typeof StoreType) => {
             };
             const data = await store.list(Tables.SECTORS, [ESelectFunct.all], filters, undefined, pages);
             const cant = await store.list(Tables.SECTORS, [`COUNT(${ESelectFunct.all}) AS COUNT`], filters, undefined, undefined);
-            const pagesObj = await getPages(cant[0].COUNT, 10, Number(page));
+            const pagesObj = await getPages(cant[0].COUNT, cantPerPage || 10, Number(page));
             return {
                 data,
                 pagesObj
@@ -49,48 +49,35 @@ export = (injectedStore: typeof StoreType) => {
         }
     }
 
-    const upsert = async (body: INewUser) => {
-
-        const user: IUser = {
-            name: body.name,
-            lastname: body.lastname,
-            email: body.email,
-            user: body.userName,
-            tel: body.tel
+    const upsert = async (body: ISectors) => {
+        const sector: ISectors = {
+            sector: body.sector,
+            description: body.description
         }
-
         if (body.id) {
-            return await store.update(Tables.ADMIN, user, body.id);
+            return await store.update(Tables.SECTORS, sector, body.id);
         } else {
-            const result = await store.insert(Tables.ADMIN, user);
-            const newAuth: Iauth = {
-                id: result.insertId,
-                user: user.user,
-                prov: 1
-            }
-            return await Authcontroller.upsert(newAuth, body.email);
+            return await store.insert(Tables.SECTORS, sector);
         }
     }
 
-    const remove = async (idUser: number) => {
-        await store.remove(Tables.ADMIN, { id: idUser })
-            .then(async (result: any) => {
-                if (result.affectedRows > 0) {
-                    await store.remove(Tables.AUTH_ADMIN, { id: idUser })
-                } else {
-                    throw new Error();
-                }
-            })
+    const remove = async (idSector: number) => {
+        const response: INewInsert = await store.remove(Tables.SECTORS, { id: idSector })
+        if (response.affectedRows > 0) {
+            return ""
+        } else {
+            throw Error("Internal error")
+        }
     }
 
-    const getUser = async (idUser: number): Promise<Array<IUser>> => {
-        return await store.get(Tables.ADMIN, idUser);
+    const getSector = async (idSector: number): Promise<Array<IUser>> => {
+        return await store.get(Tables.SECTORS, idSector);
     }
 
     return {
         list,
         upsert,
         remove,
-        getUser
+        getSector
     }
 }
