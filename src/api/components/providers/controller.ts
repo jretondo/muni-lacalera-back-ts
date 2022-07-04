@@ -1,7 +1,6 @@
 import { IJoin } from './../../../interfaces/Ifunctions';
 import { INewInsert } from './../../../interfaces/Iresponses';
 import { IProviders } from './../../../interfaces/Itables';
-import { INewUser } from './../../../interfaces/Irequests';
 import { Ipages, IWhereParams } from 'interfaces/Ifunctions';
 import { EConcatWhere, EModeWhere, ESelectFunct, ETypesJoin } from '../../../enums/EfunctMysql';
 import { Tables, Columns } from '../../../enums/EtablesDB';
@@ -74,7 +73,7 @@ export = (injectedStore: typeof StoreType) => {
                 asc: true
             };
             const data = await store.list(Tables.PROVIDERS, [ESelectFunct.all], filters, undefined, pages, [join1, join2]);
-            const cant = await store.list(Tables.PROVIDERS, [`COUNT(${ESelectFunct.all}) AS COUNT`], filters);
+            const cant = await store.list(Tables.PROVIDERS, [`COUNT(${ESelectFunct.all}) AS COUNT`], filters, undefined, undefined, [join1, join2]);
             const pagesObj = await getPages(cant[0].COUNT, 10, Number(page));
             return {
                 data,
