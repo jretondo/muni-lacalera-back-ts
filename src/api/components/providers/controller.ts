@@ -43,7 +43,6 @@ export = (injectedStore: typeof StoreType) => {
                     { column: Columns.providers.is_professional, object: String(isProf) }]
             })
         }
-        //console.log('isHealthProf :>> ', isHealthProf);
         if (isHealthProf !== "undefined") {
             filters.push({
                 mode: EModeWhere.strict,
@@ -105,7 +104,9 @@ export = (injectedStore: typeof StoreType) => {
             category: body.category,
             activity: body.activity,
             email: body.email,
-            phone: body.phone
+            phone: body.phone,
+            from_month: body.from_month,
+            to_month: body.to_month
         }
 
         if (body.id_provider) {
@@ -135,7 +136,7 @@ export = (injectedStore: typeof StoreType) => {
     }
 
     const getUser = async (idProv: number): Promise<Array<IProviders>> => {
-        console.log('idProv :>> ', idProv);
+
         return await store.getAnyCol(Tables.PROVIDERS, { id_provider: idProv });
     }
 

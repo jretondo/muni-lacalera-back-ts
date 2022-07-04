@@ -50,6 +50,8 @@ export interface IProviders {
     is_professional: boolean,
     is_health_prof: boolean,
     hours: number,
+    from_month: number,
+    to_month: number,
     month_amount: number,
     amount_id: number,
     category: string,
