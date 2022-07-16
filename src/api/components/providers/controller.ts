@@ -11,7 +11,7 @@ import { AfipClass } from '../../../utils/classes/AfipClass';
 export = (injectedStore: typeof StoreType) => {
     let store = injectedStore;
 
-    const list = async (page?: number, cantPerPage?: number, item?: string, sectorId?: String, isProf?: String, isHealthProf?: String) => {
+    const list = async (page?: number, cantPerPage?: number, item?: string, sectorId?: String, isProf?: String, isHealthProf?: String, advanceSearch?: boolean) => {
         const filters: Array<IWhereParams> | undefined = [];
         if (item) {
             const filter: IWhereParams | undefined = {
@@ -26,29 +26,31 @@ export = (injectedStore: typeof StoreType) => {
             };
             filters.push(filter);
         }
-        if (sectorId !== "undefined") {
-            filters.push({
-                mode: EModeWhere.strict,
-                concat: EConcatWhere.and,
-                items: [
-                    { column: Columns.providers.sector_id, object: String(sectorId) }]
-            })
-        }
-        if (isProf !== "undefined") {
-            filters.push({
-                mode: EModeWhere.strict,
-                concat: EConcatWhere.and,
-                items: [
-                    { column: Columns.providers.is_professional, object: String(isProf) }]
-            })
-        }
-        if (isHealthProf !== "undefined") {
-            filters.push({
-                mode: EModeWhere.strict,
-                concat: EConcatWhere.and,
-                items: [
-                    { column: Columns.providers.is_health_prof, object: String(isHealthProf) }]
-            })
+        if (advanceSearch) {
+            if (sectorId !== "undefined") {
+                filters.push({
+                    mode: EModeWhere.strict,
+                    concat: EConcatWhere.and,
+                    items: [
+                        { column: Columns.providers.sector_id, object: String(sectorId) }]
+                })
+            }
+            if (isProf !== "undefined") {
+                filters.push({
+                    mode: EModeWhere.strict,
+                    concat: EConcatWhere.and,
+                    items: [
+                        { column: Columns.providers.is_professional, object: String(isProf) }]
+                })
+            }
+            if (isHealthProf !== "undefined") {
+                filters.push({
+                    mode: EModeWhere.strict,
+                    concat: EConcatWhere.and,
+                    items: [
+                        { column: Columns.providers.is_health_prof, object: String(isHealthProf) }]
+                })
+            }
         }
 
         const join1: IJoin = {

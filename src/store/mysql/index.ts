@@ -79,7 +79,7 @@ const update = async (
     idCustom?: string | "id"
 ): Promise<any> => {
     return new Promise((resolve, reject) => {
-        connection.query(` UPDATE ${table} SET ? WHERE ${idCustom} = ? `, [data, id], (err: Error, result: any) => {
+        connection.query(` UPDATE ${table} SET ? WHERE ${idCustom ? idCustom : "id"} = ? `, [data, id], (err: Error, result: any) => {
             if (err) {
                 reject(err)
             } else {

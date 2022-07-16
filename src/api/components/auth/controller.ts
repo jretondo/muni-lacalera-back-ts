@@ -11,6 +11,7 @@ export = (injectedStore: typeof StoreType) => {
 
     const upsert = async (body: Iauth, email: string) => {
         let newAuth: Iauth;
+        console.log('body :>> ', body);
         if (body.pass) {
             newAuth = {
                 user: body.user,

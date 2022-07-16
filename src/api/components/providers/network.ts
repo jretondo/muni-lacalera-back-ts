@@ -27,7 +27,8 @@ const listPagination = (
         String(req.query.query ? req.query.query : ""),
         String(req.query.sectorId),
         String(req.query.isProf),
-        String(req.query.isHealthProf)
+        String(req.query.isHealthProf),
+        Boolean(req.query.advanceSearch)
     )
         .then((listData: any) => {
             success({ req, res, status: 200, message: listData });

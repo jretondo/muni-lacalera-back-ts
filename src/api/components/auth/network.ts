@@ -21,6 +21,7 @@ const changePass = (
     res: Response,
     next: NextFunction
 ) => {
+    console.log('req.body    :>> ', req.body);
     Controller.upsert({
         id: req.body.user.id,
         pass: req.body.password,

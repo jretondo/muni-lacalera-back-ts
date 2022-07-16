@@ -71,7 +71,7 @@ export = (injectedStore: typeof StoreType) => {
             user: body.userName,
             tel: body.tel
         }
-
+        console.log('body :>> ', body);
         if (body.id) {
             return await store.update(Tables.ADMIN, user, body.id);
         } else {
