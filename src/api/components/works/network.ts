@@ -1,4 +1,4 @@
-import { EPermissions } from './../../../enums/EtablesDB';
+import { EPermissions } from '../../../enums/EtablesDB';
 import { Router, NextFunction, Response, Request } from 'express';
 import { success } from '../../../network/response';
 const router = Router();
@@ -25,9 +25,10 @@ const listPagination = (
         Number(req.params.page),
         Number(req.query.cantPerPage),
         String(req.query.query ? req.query.query : ""),
+        Number(req.query.month),
+        Number(req.query.year),
         Number(req.query.sectorId),
-        Number(req.query.isProf),
-        Number(req.query.isHealthProf)
+        Boolean(req.query.advanceSearch)
     )
         .then((listData: any) => {
             success({ req, res, status: 200, message: listData });
@@ -72,11 +73,11 @@ const get = (
 }
 
 router
-    .get("/details/:id", secure(EPermissions.providers), get)
-    .get("/:page", secure(EPermissions.providers), listPagination)
-    .get("/", secure(EPermissions.providers), list)
-    .post("/", secure(EPermissions.providers), upsert)
-    .put("/", secure(EPermissions.providers), upsert)
-    .delete("/:id", secure(EPermissions.providers), remove);
+    .get("/details/:id", secure(EPermissions.works), get)
+    .get("/:page", secure(EPermissions.works), listPagination)
+    .get("/", secure(EPermissions.works), list)
+    .post("/", secure(EPermissions.works), upsert)
+    .put("/", secure(EPermissions.works), upsert)
+    .delete("/:id", secure(EPermissions.works), remove);
 
 export = router;

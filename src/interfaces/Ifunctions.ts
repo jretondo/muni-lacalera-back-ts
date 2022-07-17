@@ -34,7 +34,8 @@ export interface IObjectFiles {
     path: string
 }
 export interface IJoin {
-    table: string,
+    tableOrigin: string,
+    tableJoin: string,
     colJoin: string,
     colOrigin: string,
     type: ETypesJoin

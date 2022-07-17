@@ -10,7 +10,7 @@ const list = (
     res: Response,
     next: NextFunction
 ) => {
-    Controller.list(undefined, req.body.query)
+    Controller.list(undefined, undefined, String(req.query.query ? req.query.query : ""))
         .then((listData: any) => {
             success({ req, res, status: 200, message: listData });
         }).catch(next)

@@ -15,5 +15,6 @@ router
     .get("/userAdmin", secure(EPermissions.userAdmin), responseSuccess)
     .get("/providers", secure(EPermissions.providers), responseSuccess)
     .get("/payments", secure(EPermissions.paymentRegister), responseSuccess)
+    .get("/works", secure(EPermissions.works), responseSuccess)
 
 export = router;

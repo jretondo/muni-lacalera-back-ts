@@ -20,7 +20,7 @@ import activity from './components/activity/network';
 import providers from './components/providers/network';
 import sectors from './components/sectors/network';
 import amounts from './components/amount/network';
-import payments from './components/payments/network';
+import payments from './components/works/network';
 export class App {
     app: Application;
     constructor(

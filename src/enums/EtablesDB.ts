@@ -65,8 +65,8 @@ enum Amounts {
     description = "description"
 }
 
-enum Payments {
-    id = "id",
+enum Works {
+    id_payment = "id_payment",
     id_provider = "id_provider",
     hours = "hours",
     price_hour = "price_hour",
@@ -81,7 +81,8 @@ export enum EPermissions {
     userAdmin = 1,
     providers = 2,
     paymentRegister = 3,
-    reports = 4
+    reports = 4,
+    works = 5
 }
 
 export enum Tables {
@@ -93,7 +94,7 @@ export enum Tables {
     PROVIDERS = "providers",
     SECTORS = "sectors",
     AMOUNTS = "amounts",
-    PAYMENTS = "payments"
+    WORKS = "works"
 }
 
 export const Columns = {
@@ -105,5 +106,5 @@ export const Columns = {
     providers: Providers,
     sectors: Sectors,
     amounts: Amounts,
-    payments: Payments
+    works: Works
 }

@@ -60,10 +60,11 @@ export = (injectedStore: typeof StoreType) => {
             filters.push(filter);
         }
         const joinUser: IJoin = {
-            table: Tables.ADMIN,
+            tableJoin: Tables.ADMIN,
             colJoin: Columns.admin.id,
             colOrigin: Columns.activity.user_id,
-            type: ETypesJoin.left
+            type: ETypesJoin.left,
+            tableOrigin: Tables.ACTIVITY
         }
 
         let pages: Ipages;

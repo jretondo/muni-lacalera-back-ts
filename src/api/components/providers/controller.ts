@@ -13,6 +13,7 @@ export = (injectedStore: typeof StoreType) => {
 
     const list = async (page?: number, cantPerPage?: number, item?: string, sectorId?: String, isProf?: String, isHealthProf?: String, advanceSearch?: boolean) => {
         const filters: Array<IWhereParams> | undefined = [];
+
         if (item) {
             const filter: IWhereParams | undefined = {
                 mode: EModeWhere.like,
@@ -57,13 +58,15 @@ export = (injectedStore: typeof StoreType) => {
             type: ETypesJoin.none,
             colOrigin: Columns.providers.sector_id,
             colJoin: Columns.sectors.id,
-            table: Tables.SECTORS
+            tableJoin: Tables.SECTORS,
+            tableOrigin: Tables.PROVIDERS
         }
         const join2: IJoin = {
             type: ETypesJoin.none,
             colOrigin: Columns.providers.amount_id,
             colJoin: Columns.amounts.id,
-            table: Tables.AMOUNTS
+            tableJoin: Tables.AMOUNTS,
+            tableOrigin: Tables.PROVIDERS
         }
 
         let pages: Ipages;

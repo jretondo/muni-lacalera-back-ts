@@ -1,67 +1,71 @@
-import { IJoin } from './../../../interfaces/Ifunctions';
-import { INewInsert } from './../../../interfaces/Iresponses';
-import { IProviders } from './../../../interfaces/Itables';
+import { IJoin } from '../../../interfaces/Ifunctions';
+import { INewInsert } from '../../../interfaces/Iresponses';
+import { IProviders } from '../../../interfaces/Itables';
 import { Ipages, IWhereParams } from 'interfaces/Ifunctions';
 import { EConcatWhere, EModeWhere, ESelectFunct, ETypesJoin } from '../../../enums/EfunctMysql';
 import { Tables, Columns } from '../../../enums/EtablesDB';
 import StoreType from '../../../store/mysql';
 import getPages from '../../../utils/functions/getPages';
-import { AfipClass } from '../../../utils/classes/AfipClass';
 
 export = (injectedStore: typeof StoreType) => {
     let store = injectedStore;
 
-    const list = async (page?: number, cantPerPage?: number, item?: string, idProvider?: number, month?: number, year?: number) => {
+    const list = async (page?: number, cantPerPage?: number, item?: string, month?: number, year?: number, sectorId?: number, advanceSearch?: boolean) => {
         const filters: Array<IWhereParams> | undefined = [];
         if (item) {
             const filter: IWhereParams | undefined = {
                 mode: EModeWhere.like,
                 concat: EConcatWhere.or,
                 items: [
-                    { column: Columns.payments.details, object: String(item) },
-                    { column: Columns.payments.amount, object: String(item) },
+                    { column: Columns.works.details, object: String(item) },
+                    { column: Columns.works.amount, object: String(item) },
+                    { column: `${Tables.PROVIDERS}.${Columns.providers.name}`, object: String(item) },
+                    { column: `${Tables.PROVIDERS}.${Columns.providers.cuit}`, object: String(item) },
                 ]
             };
             filters.push(filter);
         }
 
-        if (month) {
-            filters.push({
-                mode: EModeWhere.strict,
-                concat: EConcatWhere.and,
-                items: [
-                    { column: Columns.payments.month, object: String(month) }]
-            })
+        if (advanceSearch) {
+            if (month) {
+                filters.push({
+                    mode: EModeWhere.strict,
+                    concat: EConcatWhere.and,
+                    items: [
+                        { column: Columns.works.month, object: String(month) }]
+                })
+            }
+            if (year) {
+                filters.push({
+                    mode: EModeWhere.strict,
+                    concat: EConcatWhere.and,
+                    items: [
+                        { column: Columns.works.year, object: String(year) }]
+                })
+            }
+            if (sectorId) {
+                filters.push({
+                    mode: EModeWhere.strict,
+                    concat: EConcatWhere.and,
+                    items: [
+                        { column: `${Tables.PROVIDERS}.${Columns.providers.sector_id}`, object: String(sectorId) }]
+                })
+            }
         }
-        if (year) {
-            filters.push({
-                mode: EModeWhere.strict,
-                concat: EConcatWhere.and,
-                items: [
-                    { column: Columns.payments.year, object: String(year) }]
-            })
-        }
-        if (idProvider) {
-            filters.push({
-                mode: EModeWhere.strict,
-                concat: EConcatWhere.and,
-                items: [
-                    { column: Columns.payments.id_provider, object: String(idProvider) }]
-            })
-        }
-
 
         const join1: IJoin = {
             type: ETypesJoin.none,
-            colOrigin: Columns.payments.id_provider,
+            colOrigin: Columns.works.id_provider,
             colJoin: Columns.providers.id_provider,
-            table: Tables.PROVIDERS
+            tableJoin: Tables.PROVIDERS,
+            tableOrigin: Tables.WORKS
         }
         const join2: IJoin = {
             type: ETypesJoin.none,
             colOrigin: Columns.providers.sector_id,
             colJoin: Columns.sectors.id,
-            table: Tables.SECTORS
+            tableJoin: Tables.SECTORS,
+            tableOrigin: Tables.PROVIDERS
         }
 
         let pages: Ipages;
@@ -69,18 +73,18 @@ export = (injectedStore: typeof StoreType) => {
             pages = {
                 currentPage: page,
                 cantPerPage: cantPerPage || 10,
-                order: Columns.payments.id,
+                order: Columns.works.id_payment,
                 asc: false
             };
-            const data = await store.list(Tables.PAYMENTS, [ESelectFunct.all], filters, undefined, pages, [join1, join2]);
-            const cant = await store.list(Tables.PAYMENTS, [`COUNT(${ESelectFunct.all}) AS COUNT`], filters, undefined, undefined, [join1, join2]);
+            const data = await store.list(Tables.WORKS, [ESelectFunct.all], filters, undefined, pages, [join1, join2]);
+            const cant = await store.list(Tables.WORKS, [`COUNT(${ESelectFunct.all}) AS COUNT`], filters, undefined, undefined, [join1, join2]);
             const pagesObj = await getPages(cant[0].COUNT, 10, Number(page));
             return {
                 data,
                 pagesObj
             };
         } else {
-            const data = await store.list(Tables.PAYMENTS, [ESelectFunct.all], filters, undefined, undefined, [join1, join2]);
+            const data = await store.list(Tables.WORKS, [ESelectFunct.all], filters, undefined, undefined, [join1, join2]);
             return {
                 data
             };

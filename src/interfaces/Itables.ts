@@ -33,7 +33,7 @@ export interface IAmounts {
     description: string
 }
 export interface IPayments {
-    id?: number,
+    id_payment?: number,
     id_provider: number,
     hours: number,
     price_hour: number,

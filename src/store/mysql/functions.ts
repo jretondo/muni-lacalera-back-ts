@@ -84,7 +84,7 @@ export const selectContructor = (
 
     if (join) {
         join.map(item => {
-            query = ` ${query} ${item.type} JOIN ${item.table} ON ${table}.${item.colOrigin} = ${item.table}.${item.colJoin} `
+            query = ` ${query} ${item.type} JOIN ${item.tableJoin} ON ${item.tableOrigin}.${item.colOrigin} = ${item.tableJoin}.${item.colJoin} `
         })
     }
 
