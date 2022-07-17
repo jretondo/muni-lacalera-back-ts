@@ -32,6 +32,17 @@ export interface IAmounts {
     per_hour: boolean,
     description: string
 }
+export interface IPayments {
+    id?: number,
+    id_provider: number,
+    hours: number,
+    price_hour: number,
+    amount: number,
+    extra: boolean,
+    month: number,
+    year: number,
+    details: string
+}
 
 export interface ISectors {
     id?: number,

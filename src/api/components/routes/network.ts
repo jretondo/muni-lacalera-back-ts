@@ -14,5 +14,6 @@ router
     .get("/changePass", secure(), responseSuccess)
     .get("/userAdmin", secure(EPermissions.userAdmin), responseSuccess)
     .get("/providers", secure(EPermissions.providers), responseSuccess)
+    .get("/payments", secure(EPermissions.paymentRegister), responseSuccess)
 
 export = router;
