@@ -107,9 +107,7 @@ export = (injectedStore: typeof StoreType) => {
             category: body.category,
             activity: body.activity,
             email: body.email,
-            phone: body.phone,
-            from_month: body.from_month,
-            to_month: body.to_month
+            phone: body.phone
         }
 
         if (body.id_provider) {

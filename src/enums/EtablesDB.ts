@@ -45,6 +45,8 @@ enum Providers {
     hours = "hours",
     month_amount = "month_amount",
     amount_id = "amount_id",
+    category = "category",
+    activity = "activity",
     email = "email",
     phone = "phone",
     created = "created",
@@ -77,6 +79,14 @@ enum Works {
     details = "details"
 }
 
+enum Contracts {
+    id_contract = "id_contract",
+    id_prov = "id_prov",
+    from = "from",
+    to = "to",
+    created = "created"
+}
+
 export enum EPermissions {
     userAdmin = 1,
     providers = 2,
@@ -94,7 +104,8 @@ export enum Tables {
     PROVIDERS = "providers",
     SECTORS = "sectors",
     AMOUNTS = "amounts",
-    WORKS = "works"
+    WORKS = "works",
+    CONTRACTS = "contracts"
 }
 
 export const Columns = {
@@ -106,5 +117,6 @@ export const Columns = {
     providers: Providers,
     sectors: Sectors,
     amounts: Amounts,
-    works: Works
+    works: Works,
+    contracts: Contracts
 }
