@@ -70,3 +70,12 @@ export interface IProviders {
     created?: Date,
     updated?: Date
 }
+
+export interface IContracts {
+    id_contract?: number,
+    id_prov: number,
+    from: Date,
+    to: Date,
+    created?: Date,
+    detail?: string
+}

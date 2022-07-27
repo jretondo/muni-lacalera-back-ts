@@ -1,12 +1,15 @@
+import { INewProvider } from './../../../interfaces/Irequests';
 import { IJoin } from './../../../interfaces/Ifunctions';
 import { INewInsert } from './../../../interfaces/Iresponses';
-import { IProviders } from './../../../interfaces/Itables';
+import { IProviders, IContracts } from './../../../interfaces/Itables';
 import { Ipages, IWhereParams } from 'interfaces/Ifunctions';
 import { EConcatWhere, EModeWhere, ESelectFunct, ETypesJoin } from '../../../enums/EfunctMysql';
 import { Tables, Columns } from '../../../enums/EtablesDB';
 import StoreType from '../../../store/mysql';
 import getPages from '../../../utils/functions/getPages';
 import { AfipClass } from '../../../utils/classes/AfipClass';
+import ContractsController from '../contracts';
+import moment from 'moment';
 
 export = (injectedStore: typeof StoreType) => {
     let store = injectedStore;
@@ -92,7 +95,7 @@ export = (injectedStore: typeof StoreType) => {
         }
     }
 
-    const upsert = async (body: IProviders) => {
+    const upsert = async (body: INewProvider) => {
         const provider: IProviders = {
             name: body.name,
             sector_id: body.sector_id,
@@ -120,7 +123,21 @@ export = (injectedStore: typeof StoreType) => {
             }
         } else {
             const resInsert: INewInsert = await store.insert(Tables.PROVIDERS, provider);
+            const idProv = resInsert.insertId
+            const fromDateStr: string = `${body.from_year}-${body.from_month}-01`
+            const toDateStr: string = `${body.to_year}-${Number(body.to_month) + 1}-01`
+            const fromDate: Date = moment(new Date(fromDateStr)).toDate()
+            const toDate: Date = moment(new Date(toDateStr)).toDate()
+            toDate.setDate(toDate.getDate() - 1)
+
+            const newContract: IContracts = {
+                id_prov: idProv,
+                from: fromDate,
+                to: toDate,
+                detail: "Primer contrato"
+            }
             if (resInsert.affectedRows > 0) {
+                await ContractsController.upsert(newContract)
                 return "ok"
             } else {
                 throw new Error(resInsert.message)
@@ -129,7 +146,7 @@ export = (injectedStore: typeof StoreType) => {
     }
 
     const remove = async (idProv: number) => {
-        const resInsert: INewInsert = await store.remove(Tables.PROVIDERS, { id: idProv })
+        const resInsert: INewInsert = await store.remove(Tables.PROVIDERS, { id_provider: idProv })
         if (resInsert.affectedRows > 0) {
             return "ok"
         } else {

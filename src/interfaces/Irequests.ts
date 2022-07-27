@@ -1,3 +1,4 @@
+import { IProviders } from './Itables';
 export interface INewUser {
     id?: number,
     name: string,
@@ -13,4 +14,11 @@ export interface INewPermissions {
 
 export interface INewPermission {
     idPermission: number
+}
+
+export interface INewProvider extends IProviders {
+    from_month: number,
+    to_month: number,
+    from_year: number,
+    to_year: number
 }
