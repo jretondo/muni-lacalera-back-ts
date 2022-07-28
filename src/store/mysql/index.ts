@@ -140,6 +140,19 @@ const get = async (table: Tables, id: number): Promise<any> => {
         })
     })
 }
+
+const anyWhere = async (table: Tables, where: string): Promise<any> => {
+    return new Promise((resolve, reject) => {
+        connection.query(` SELECT * FROM ${table} WHERE ${where} `, (err: Error, data: any) => {
+            if (err) {
+                reject(err)
+            } else {
+                resolve(data)
+            }
+        })
+    })
+}
+
 const getAnyCol = async (table: Tables, data: object): Promise<any> => {
     return new Promise((resolve, reject) => {
         connection.query(` SELECT * FROM ${table} WHERE ? `, [data], (err: Error, data: any) => {
@@ -162,6 +175,7 @@ const list = (
     order?: Iorder
 ): Promise<any> => {
     const query = selectContructor(table, colSelect, whereParams, groupBy, pages, join, order);
+
     return new Promise((resolve, reject) => {
         connection.query(query, (err: Error, data: any) => {
             if (err) {
@@ -199,5 +213,6 @@ export = {
     mInsert,
     list,
     updateWhere,
-    getAnyCol
+    getAnyCol,
+    anyWhere
 }

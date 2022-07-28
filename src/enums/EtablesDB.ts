@@ -82,8 +82,8 @@ enum Works {
 enum Contracts {
     id_contract = "id_contract",
     id_prov = "id_prov",
-    from = "from",
-    to = "to",
+    from_contract = "from_contract",
+    to_contract = "to_contract",
     created = "created"
 }
 

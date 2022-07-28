@@ -5,6 +5,7 @@ import { EConcatWhere, EModeWhere, ESelectFunct } from '../../../enums/EfunctMys
 import { Tables, Columns } from '../../../enums/EtablesDB';
 import StoreType from '../../../store/mysql';
 import getPages from '../../../utils/functions/getPages';
+import moment from 'moment';
 export = (injectedStore: typeof StoreType) => {
     let store = injectedStore;
 
@@ -46,24 +47,33 @@ export = (injectedStore: typeof StoreType) => {
     const upsert = async (body: IContracts) => {
         const contract: IContracts = {
             id_prov: body.id_prov,
-            from: body.from,
-            to: body.to
+            from_contract: body.from_contract,
+            to_contract: body.to_contract,
+            detail: body.detail
         }
 
-        if (body.id_contract) {
-            const resInsert: INewInsert = await store.update(Tables.CONTRACTS, contract, body.id_contract, Columns.contracts.id_contract);
-            if (resInsert.affectedRows > 0) {
-                return "ok"
+        const query = ` ((${Columns.contracts.from_contract} <= '${contract.from_contract}'  AND ${Columns.contracts.to_contract} >= '${contract.from_contract}')  OR   (${Columns.contracts.from_contract} <= '${contract.to_contract}'  AND ${Columns.contracts.to_contract} >= '${contract.to_contract}')) AND (${Columns.contracts.id_prov} = '${contract.id_prov}')`
+
+        const listFilter: Array<IContracts> = await store.anyWhere(Tables.CONTRACTS, query)
+
+        if (listFilter.length === 0) {
+            if (body.id_contract) {
+                const resInsert: INewInsert = await store.update(Tables.CONTRACTS, contract, body.id_contract, Columns.contracts.id_contract);
+                if (resInsert.affectedRows > 0) {
+                    return "ok"
+                } else {
+                    throw new Error(resInsert.message)
+                }
             } else {
-                throw new Error(resInsert.message)
+                const resInsert: INewInsert = await store.insert(Tables.CONTRACTS, contract);
+                if (resInsert.affectedRows > 0) {
+                    return "ok"
+                } else {
+                    throw new Error(resInsert.message)
+                }
             }
         } else {
-            const resInsert: INewInsert = await store.insert(Tables.CONTRACTS, contract);
-            if (resInsert.affectedRows > 0) {
-                return "ok"
-            } else {
-                throw new Error(resInsert.message)
-            }
+            throw new Error("El contrato pisa un contrato existente!")
         }
     }
 

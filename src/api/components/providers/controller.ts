@@ -124,16 +124,18 @@ export = (injectedStore: typeof StoreType) => {
         } else {
             const resInsert: INewInsert = await store.insert(Tables.PROVIDERS, provider);
             const idProv = resInsert.insertId
-            const fromDateStr: string = `${body.from_year}-${body.from_month}-01`
-            const toDateStr: string = `${body.to_year}-${Number(body.to_month) + 1}-01`
-            const fromDate: Date = moment(new Date(fromDateStr)).toDate()
-            const toDate: Date = moment(new Date(toDateStr)).toDate()
+
+            const fromDateStr = `${body.from_year}-${body.from_month}-01`
+            const toDateStr = `${body.to_year}-${body.to_month}-01`
+            const fromDate = moment(fromDateStr, "YYYY-MM-DD").toDate()
+            const toDate = moment(toDateStr, "YYYY-MM-DD").toDate()
+            toDate.setMonth(toDate.getMonth() + 1)
             toDate.setDate(toDate.getDate() - 1)
 
             const newContract: IContracts = {
                 id_prov: idProv,
-                from: fromDate,
-                to: toDate,
+                from_contract: fromDate,
+                to_contract: toDate,
                 detail: "Primer contrato"
             }
             if (resInsert.affectedRows > 0) {
