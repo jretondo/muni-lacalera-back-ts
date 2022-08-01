@@ -68,7 +68,7 @@ enum Amounts {
 }
 
 enum Works {
-    id_payment = "id_payment",
+    id_work = "id_work",
     id_provider = "id_provider",
     hours = "hours",
     price_hour = "price_hour",
@@ -76,7 +76,8 @@ enum Works {
     extra = "extra",
     month = "month",
     year = "year",
-    details = "details"
+    details = "details",
+    id_contract = "id_contract"
 }
 
 enum Contracts {
@@ -87,10 +88,25 @@ enum Contracts {
     created = "created"
 }
 
+enum Payments {
+    id_payment = "id_payment",
+    pv = "pv",
+    number = "number",
+    id_provider = "id_provider",
+    dni = "dni",
+    month = "month",
+    year = "year",
+    amount = "amount",
+    details = "details",
+    type = "type",
+    date = "date",
+    advance = "advance"
+}
+
 export enum EPermissions {
     userAdmin = 1,
     providers = 2,
-    paymentRegister = 3,
+    payments = 3,
     reports = 4,
     works = 5
 }
@@ -105,7 +121,8 @@ export enum Tables {
     SECTORS = "sectors",
     AMOUNTS = "amounts",
     WORKS = "works",
-    CONTRACTS = "contracts"
+    CONTRACTS = "contracts",
+    PAYMENTS = "payments"
 }
 
 export const Columns = {
@@ -118,5 +135,6 @@ export const Columns = {
     sectors: Sectors,
     amounts: Amounts,
     works: Works,
-    contracts: Contracts
+    contracts: Contracts,
+    payments: Payments
 }

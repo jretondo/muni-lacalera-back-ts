@@ -32,17 +32,6 @@ export interface IAmounts {
     per_hour: boolean,
     description: string
 }
-export interface IPayments {
-    id_payment?: number,
-    id_provider: number,
-    hours: number,
-    price_hour: number,
-    amount: number,
-    extra: boolean,
-    month: number,
-    year: number,
-    details: string
-}
 
 export interface ISectors {
     id?: number,
@@ -78,4 +67,32 @@ export interface IContracts {
     to_contract: Date,
     created?: Date,
     detail?: string
+}
+
+export interface IWork {
+    id_work?: number,
+    id_provider: number,
+    hours: number,
+    price_hour: number,
+    amount: number,
+    extra: boolean,
+    month: number,
+    year: number,
+    details: string,
+    id_contract: number
+}
+
+export interface IPayment {
+    id_payment?: number,
+    date?: Date,
+    pv: number,
+    number: number,
+    id_provider: number,
+    dni: string,
+    month: number,
+    year: number,
+    amount: number,
+    details: string,
+    type: string,
+    advance: boolean
 }

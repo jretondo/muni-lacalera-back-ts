@@ -1,4 +1,4 @@
-import { EPermissions } from './../../../enums/EtablesDB';
+import { EPermissions } from '../../../enums/EtablesDB';
 import { Router, NextFunction, Response, Request } from 'express';
 import { success } from '../../../network/response';
 const router = Router();
@@ -10,7 +10,7 @@ const list = (
     res: Response,
     next: NextFunction
 ) => {
-    Controller.list(undefined, undefined, String(req.query.query ? req.query.query : ""))
+    Controller.list(undefined, req.body.query)
         .then((listData: any) => {
             success({ req, res, status: 200, message: listData });
         }).catch(next)
@@ -25,10 +25,25 @@ const listPagination = (
         Number(req.params.page),
         Number(req.query.cantPerPage),
         String(req.query.query ? req.query.query : ""),
-        String(req.query.sectorId),
-        String(req.query.isProf),
-        String(req.query.isHealthProf),
+        Number(req.query.month),
+        Number(req.query.year),
+        Number(req.query.sectorId),
         Boolean(req.query.advanceSearch)
+    )
+        .then((listData: any) => {
+            success({ req, res, status: 200, message: listData });
+        }).catch(next)
+};
+
+const provList = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    Controller.provList(
+        Number(req.query.idProv),
+        Number(req.params.page),
+        Number(req.query.cantPerPage)
     )
         .then((listData: any) => {
             success({ req, res, status: 200, message: listData });
@@ -66,30 +81,37 @@ const get = (
     res: Response,
     next: NextFunction
 ) => {
-    Controller.getProvider(Number(req.params.id))
+    Controller.getUser(Number(req.params.id))
         .then((data) => {
             success({ req, res, message: data });
         }).catch(next)
 }
 
-const getDataFiscal = (
+const summaryWorks = (
     req: Request,
     res: Response,
     next: NextFunction
 ) => {
-    Controller.getDataFiscal(Number(req.query.cuit))
-        .then((data) => {
-            success({ req, res, message: data });
-        }).catch(next)
+    Controller.summaryWorks(
+        Number(req.query.fromMonth),
+        Number(req.query.fromYear),
+        Number(req.query.toMonth),
+        Number(req.query.toYear),
+        String(req.query.idSector),
+        String(req.query.idProvider)
+    ).then((data) => {
+        success({ req, res, message: data });
+    }).catch(next)
 }
 
 router
-    .get("/details/:id", secure(EPermissions.providers), get)
-    .get("/fiscal", secure(EPermissions.providers), getDataFiscal)
-    .get("/:page", secure(EPermissions.providers), listPagination)
-    .get("/", secure(EPermissions.providers), list)
-    .post("/", secure(EPermissions.providers), upsert)
-    .put("/", secure(EPermissions.providers), upsert)
-    .delete("/:id", secure(EPermissions.providers), remove);
+    .get("/details/:id", secure(EPermissions.payments), get)
+    .get("/provider/:page", secure(EPermissions.payments), provList)
+    .get("/summary", secure(EPermissions.payments), summaryWorks)
+    .get("/:page", secure(EPermissions.payments), listPagination)
+    .get("/", secure(EPermissions.payments), list)
+    .post("/", secure(EPermissions.payments), upsert)
+    .put("/", secure(EPermissions.payments), upsert)
+    .delete("/:id", secure(EPermissions.payments), remove);
 
 export = router;

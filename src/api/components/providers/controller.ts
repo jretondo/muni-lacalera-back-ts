@@ -1,6 +1,6 @@
 import { INewProvider } from './../../../interfaces/Irequests';
 import { IJoin } from './../../../interfaces/Ifunctions';
-import { INewInsert } from './../../../interfaces/Iresponses';
+import { INewInsert, IProviderData } from './../../../interfaces/Iresponses';
 import { IProviders, IContracts } from './../../../interfaces/Itables';
 import { Ipages, IWhereParams } from 'interfaces/Ifunctions';
 import { EConcatWhere, EModeWhere, ESelectFunct, ETypesJoin } from '../../../enums/EfunctMysql';
@@ -156,9 +156,27 @@ export = (injectedStore: typeof StoreType) => {
         }
     }
 
-    const getUser = async (idProv: number): Promise<Array<IProviders>> => {
-
-        return await store.getAnyCol(Tables.PROVIDERS, { id_provider: idProv });
+    const getProvider = async (idProv: number): Promise<Array<IProviderData>> => {
+        const filter: Array<IWhereParams> = [{
+            mode: EModeWhere.strict,
+            concat: EConcatWhere.none,
+            items: [{ column: Columns.providers.id_provider, object: String(idProv) }]
+        }]
+        const join1: IJoin = {
+            type: ETypesJoin.none,
+            colOrigin: Columns.providers.sector_id,
+            colJoin: Columns.sectors.id,
+            tableJoin: Tables.SECTORS,
+            tableOrigin: Tables.PROVIDERS
+        }
+        const join2: IJoin = {
+            type: ETypesJoin.none,
+            colOrigin: Columns.providers.amount_id,
+            colJoin: Columns.amounts.id,
+            tableJoin: Tables.AMOUNTS,
+            tableOrigin: Tables.PROVIDERS
+        }
+        return await store.list(Tables.PROVIDERS, ["*"], filter, undefined, undefined, [join1, join2]);
     }
 
     const getDataFiscal = async (cuit: number) => {
@@ -174,7 +192,7 @@ export = (injectedStore: typeof StoreType) => {
         list,
         upsert,
         remove,
-        getUser,
+        getProvider,
         getDataFiscal
     }
 }

@@ -35,12 +35,27 @@ const listPagination = (
         }).catch(next)
 };
 
+const provList = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    Controller.provList(
+        Number(req.query.idProv),
+        Number(req.params.page),
+        Number(req.query.cantPerPage)
+    )
+        .then((listData: any) => {
+            success({ req, res, status: 200, message: listData });
+        }).catch(next)
+};
+
 const upsert = (
     req: Request,
     res: Response,
     next: NextFunction
 ) => {
-    Controller.upsert(req.body)
+    Controller.upsert(req.body, req.body.isHealthProf)
         .then(response => {
             if (response) {
                 success({ req, res, status: 201 });
@@ -72,8 +87,27 @@ const get = (
         }).catch(next)
 }
 
+const summaryWorks = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    Controller.summaryWorks(
+        Number(req.query.fromMonth),
+        Number(req.query.fromYear),
+        Number(req.query.toMonth),
+        Number(req.query.toYear),
+        String(req.query.idSector),
+        String(req.query.idProvider)
+    ).then((data) => {
+        success({ req, res, message: data });
+    }).catch(next)
+}
+
 router
     .get("/details/:id", secure(EPermissions.works), get)
+    .get("/provider/:page", secure(EPermissions.works), provList)
+    .get("/summary", secure(EPermissions.works), summaryWorks)
     .get("/:page", secure(EPermissions.works), listPagination)
     .get("/", secure(EPermissions.works), list)
     .post("/", secure(EPermissions.works), upsert)

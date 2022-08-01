@@ -209,14 +209,10 @@ export const selectContructor = (
     if (groupBy) {
         query = `${query} GROUP BY `;
         groupBy.map((item, key) => {
-            if (key === groupBy.length - 1) {
+            if (key === 0) {
                 query = `${query} ${item}`;
             } else {
-                if (groupBy.length - 1 === key) {
-                    query = `${query} ${item} `;
-                } else {
-                    query = `${query}, ${item} `;
-                }
+                query = `${query}, ${item} `;
             }
         })
     }
@@ -245,6 +241,8 @@ export const selectContructor = (
         } else {
             query = ` ${query} ORDER BY ${pages.order} ${asc} LIMIT ${desdePag}, ${pages.cantPerPage} `;
         }
+    } else {
+        query = ` ${query} ${strOrder} `;
     }
     return query;
 }

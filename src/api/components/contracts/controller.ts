@@ -1,11 +1,10 @@
 import { INewInsert } from './../../../interfaces/Iresponses';
-import { IContracts, IProviders } from './../../../interfaces/Itables';
+import { IContracts } from './../../../interfaces/Itables';
 import { Ipages, IWhereParams } from 'interfaces/Ifunctions';
 import { EConcatWhere, EModeWhere, ESelectFunct } from '../../../enums/EfunctMysql';
 import { Tables, Columns } from '../../../enums/EtablesDB';
 import StoreType from '../../../store/mysql';
 import getPages from '../../../utils/functions/getPages';
-import moment from 'moment';
 export = (injectedStore: typeof StoreType) => {
     let store = injectedStore;
 
@@ -60,14 +59,14 @@ export = (injectedStore: typeof StoreType) => {
             if (body.id_contract) {
                 const resInsert: INewInsert = await store.update(Tables.CONTRACTS, contract, body.id_contract, Columns.contracts.id_contract);
                 if (resInsert.affectedRows > 0) {
-                    return "ok"
+                    return resInsert
                 } else {
                     throw new Error(resInsert.message)
                 }
             } else {
                 const resInsert: INewInsert = await store.insert(Tables.CONTRACTS, contract);
                 if (resInsert.affectedRows > 0) {
-                    return "ok"
+                    return resInsert
                 } else {
                     throw new Error(resInsert.message)
                 }
