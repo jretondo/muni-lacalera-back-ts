@@ -36,10 +36,11 @@ const newAdvance = (
         providerName: "RETONDO JAVIER EDGARDO",
         dni: "35092514",
         type: "TIPO DE PRUEBA",
-        period: "Julio/2022",
+        periods: ["JULIO/2022", "AGOSTO/2022"],
         amount: "25.236,45",
         details: "dagdagdsgdsgds sdgsd  esg s r gs gsg segsewgewsg esgewsrg ",
         logo: 'data:image/png;base64,' + logo64,
+        title: "PAGO DE ADELANTO"
     }
 
     res.render('reports/payments/Advance.ejs', datos2);

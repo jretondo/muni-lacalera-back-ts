@@ -1,3 +1,4 @@
+import { file } from './../../../network/response';
 import { EPermissions } from '../../../enums/EtablesDB';
 import { Router, NextFunction, Response, Request } from 'express';
 import { success } from '../../../network/response';
@@ -56,13 +57,10 @@ const upsert = (
     next: NextFunction
 ) => {
     Controller.upsert(req.body)
-        .then(response => {
-            if (response) {
-                success({ req, res, status: 201 });
-            } else {
-                next(response);
-            }
-        }).catch(next)
+        .then((dataFact) => {
+            file(req, res, dataFact.filePath, 'application/pdf', dataFact.fileName, dataFact);
+        })
+        .catch(next)
 }
 
 const remove = (

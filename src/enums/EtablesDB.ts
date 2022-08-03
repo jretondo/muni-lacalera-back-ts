@@ -94,13 +94,20 @@ enum Payments {
     number = "number",
     id_provider = "id_provider",
     dni = "dni",
-    month = "month",
-    year = "year",
-    amount = "amount",
+    total = "total",
     details = "details",
     type = "type",
     date = "date",
     advance = "advance"
+}
+
+enum DetPayments {
+    id = "id",
+    month = "month",
+    year = "year",
+    amount = "amount",
+    payment_id = "payment_id",
+    id_provider = "id_provider"
 }
 
 export enum EPermissions {
@@ -122,7 +129,8 @@ export enum Tables {
     AMOUNTS = "amounts",
     WORKS = "works",
     CONTRACTS = "contracts",
-    PAYMENTS = "payments"
+    PAYMENTS = "payments",
+    PAYMENT_DETAILS = "payment_details"
 }
 
 export const Columns = {
@@ -136,5 +144,6 @@ export const Columns = {
     amounts: Amounts,
     works: Works,
     contracts: Contracts,
-    payments: Payments
+    payments: Payments,
+    payment_details: DetPayments
 }

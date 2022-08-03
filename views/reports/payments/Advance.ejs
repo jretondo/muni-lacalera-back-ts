@@ -11,13 +11,16 @@
   <%- myCss %>
 
     <main>
+      <div class="cut"></div>
       <div class="first">
         <div id="logo" style="width: 55%;">
           <img style="width: 100%;height:100% ;" src="<%- logo %> ">
         </div>
 
         <div id="company" style="margin-bottom: 21px;text-align: left;">
-          <h2 class="name" style="margin-bottom: 10px;border: 2px solid black;padding: 6px;">VALE DE ADELANTO</h2>
+          <h2 class="name" style="margin-bottom: 10px;border: 2px solid black;padding: 6px;">
+            <%- title %>
+          </h2>
           <h2 class="name" style="margin-bottom: 10px;">FECHA: <span style="font-weight: bold;">
               <%- date %>
             </span></h2>
@@ -39,7 +42,7 @@
             <div class="email">
               <h2 class="name">
                 <span style="font-weight: bold;">TIPO DE LIQUIDACIÓN:</span>
-                ADELANTO
+                <%- type %>
               </h2>
             </div>
           </div>
@@ -47,13 +50,13 @@
 
 
         <h4 style="text-align: center;margin: 10px;">MONOTRIBUTISTA</h4>
-        <div class="divide">
+        <div class="divide1">
           <div id="details" class="clearfix">
             <div>
               <h2 class="name">
                 <span style="font-weight: bold;">OBERVACIONES:</span>
               </h2>
-              <div style="height: 90px;width: 100%;border: 1px solid black;">
+              <div style="height: 90px;width: 100%;border: 1px solid black;text-align: left;">
                 <span>
                   <%- details %>
                 </span>
@@ -61,42 +64,15 @@
             </div>
           </div>
         </div>
-        <div class="divide">
+        <div class="divide2">
           <table border="0" cellspacing="0" cellpadding="0">
             <thead>
               <tr>
-                <th class="no" style="font-size: 18px;">PERIODOS</th>
+                <th class="no">PERIODOS</th>
               </tr>
-              <tr>
-                <th class="desc" style="text-align: center;font-weight: bold">
-                  <%- period %>
-                </th>
-              </tr>
-              <tr>
-                <th class="desc" style="text-align: center;font-weight: bold">
-                  <%- period %>
-                </th>
-              </tr>
-              <tr>
-                <th class="desc" style="text-align: center;font-weight: bold">
-                  <%- period %>
-                </th>
-              </tr>
-              <tr>
-                <th class="desc" style="text-align: center;font-weight: bold">
-                  <%- period %>
-                </th>
-              </tr>
-              <tr>
-                <th class="desc" style="text-align: center;font-weight: bold">
-                  <%- period %>
-                </th>
-              </tr>
-              <tr>
-                <th class="desc" style="text-align: center;font-weight: bold">
-                  <%- period %>
-                </th>
-              </tr>
+              <% periods.map((period)=>{ %>
+                <%- include('./Period.ejs', {period: period}) %>
+                  <% }); %>
             </thead>
 
             <tfoot>
@@ -139,8 +115,9 @@
         </div>
 
         <div id="company" style="margin-bottom: 21px;text-align: left;">
-          <h2 class="name" style="margin-bottom: 10px;border: 2px solid black;padding: 6px;">VALE DE ADELANTO DE
-            SUELDO</h2>
+          <h2 class="name" style="margin-bottom: 10px;border: 2px solid black;padding: 6px;">
+            <%- title %>
+          </h2>
           <h2 class="name" style="margin-bottom: 10px;">FECHA: <span style="font-weight: bold;">
               <%- date %>
             </span></h2>
@@ -152,7 +129,7 @@
               <%- paymentNumber %>
             </h2>
             <h2 class="name">
-              <span style="font-weight: bold;">EMPLEADO:</span>
+              <span style="font-weight: bold;">MONOTRIBUTISTA:</span>
               <%- providerName %>
             </h2>
             <h2 class="name">
@@ -162,43 +139,52 @@
             <div class="email">
               <h2 class="name">
                 <span style="font-weight: bold;">TIPO DE LIQUIDACIÓN:</span>
-                <%- type %>
+                <%- type %>º
               </h2>
             </div>
           </div>
         </div>
+        <h4 style="text-align: center;margin: 10px;">MONOTRIBUTISTA</h4>
+        <div class="divide1">
+          <div id="details" class="clearfix">
+            <div>
+              <h2 class="name">
+                <span style="font-weight: bold;">OBERVACIONES:</span>
+              </h2>
+              <div style="height: 90px;width: 100%;border: 1px solid black;text-align: left;">
+                <span>
+                  <%- details %>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="divide2">
+          <table border="0" cellspacing="0" cellpadding="0">
+            <thead>
+              <tr>
+                <th class="no">PERIODOS</th>
+              </tr>
+              <% periods.map((period)=>{ %>
+                <%- include('./Period.ejs', {period: period}) %>
+                  <% }); %>
+            </thead>
+
+            <tfoot>
+            </tfoot>
+          </table>
+        </div>
         <table border="0" cellspacing="0" cellpadding="0">
           <thead>
             <tr>
-              <th class="no">Periodo</th>
-              <th class="desc" style="text-align: center;font-weight: bold">
-                <%- period %>
+              <th class="no" style="font-size: 20px;">Importe</th>
+              <th class="desc" style="text-align: center;font-weight: bold;font-size: 20px;">$ <%- amount %>
               </th>
-              <th class="no">Importe</th>
-              <th class="desc" style="text-align: center;font-weight: bold;">$ <%- amount %>
-              </th>
-            </tr>
           </thead>
 
           <tfoot>
           </tfoot>
         </table>
-
-        <h4 style="text-align: center;">BECA: MONOTRIBUTISTA</h4>
-
-        <div id="details" class="clearfix">
-          <div>
-            <h2 class="name">
-              <span style="font-weight: bold;">OBERVACIONES:</span>
-            </h2>
-            <div style="height: 90px;width: 100%;border: 1px solid black;">
-              <span>
-                <%- details %>
-              </span>
-            </div>
-          </div>
-        </div>
-        <hr />
         <div id="company" style="margin-top: 21px;text-align: left;width: 50%;">
           <div style="height: 35px;">
 
@@ -210,6 +196,11 @@
           </div>
           <hr style="color: #8080805c;" />
           <h2 class="name" style="margin-bottom: 10px;text-align: center;">ACLARACIÓN</h2>
+          <div style="height: 35px;">
+
+          </div>
+          <hr style="color: #8080805c;" />
+          <h2 class="name" style="margin-bottom: 10px;text-align: center;">DNI</h2>
 
         </div>
       </div>

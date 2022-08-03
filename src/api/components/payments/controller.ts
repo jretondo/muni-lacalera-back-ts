@@ -1,5 +1,6 @@
+import { INewPayment } from './../../../interfaces/Irequests';
 import { IProviderData } from '../../../interfaces/Iresponses';
-import { IContracts, IPayment, IWork } from '../../../interfaces/Itables';
+import { IContracts, IDetPayments, IPayment, IWork } from '../../../interfaces/Itables';
 import { IJoin, IWhere } from '../../../interfaces/Ifunctions';
 import { INewInsert } from '../../../interfaces/Iresponses';
 import { IProviders } from '../../../interfaces/Itables';
@@ -11,6 +12,7 @@ import getPages from '../../../utils/functions/getPages';
 import moment from 'moment';
 import contractsController from '../contracts';
 import providersController from '../providers';
+import { createPDFPayment } from '../../../utils/reportsGenerate/newPayment';
 
 export = (injectedStore: typeof StoreType) => {
     let store = injectedStore;
@@ -23,7 +25,7 @@ export = (injectedStore: typeof StoreType) => {
                 concat: EConcatWhere.or,
                 items: [
                     { column: Columns.payments.details, object: String(item) },
-                    { column: Columns.payments.amount, object: String(item) },
+                    { column: Columns.payments.total, object: String(item) },
                     { column: `${Tables.PROVIDERS}.${Columns.providers.name}`, object: String(item) },
                     { column: `${Tables.PROVIDERS}.${Columns.providers.cuit}`, object: String(item) },
                 ]
@@ -32,22 +34,28 @@ export = (injectedStore: typeof StoreType) => {
         }
 
         if (advanceSearch) {
-            if (month) {
-                filters.push({
-                    mode: EModeWhere.strict,
-                    concat: EConcatWhere.and,
-                    items: [
-                        { column: Columns.payments.month, object: String(month) }]
-                })
-            }
-            if (year) {
-                filters.push({
-                    mode: EModeWhere.strict,
-                    concat: EConcatWhere.and,
-                    items: [
-                        { column: Columns.payments.year, object: String(year) }]
-                })
-            }
+            const fromDateStr = `${year}-${month}-01`
+            const fromDate = moment(fromDateStr, "YYYY-MM-DD").toDate()
+            const toDateStr = `${year}-${month}-01`
+            const toDate = moment(toDateStr, "YYYY-MM-DD").toDate()
+            toDate.setMonth(toDate.getMonth() + 1)
+            toDate.setDate(toDate.getDate() - 1)
+
+            filters.push({
+                mode: EModeWhere.higherEqual,
+                concat: EConcatWhere.and,
+                items: [
+                    { column: Columns.payments.date, object: String(moment(fromDate).format("YYYY-MM-DD")) }]
+            })
+
+
+            filters.push({
+                mode: EModeWhere.lessEqual,
+                concat: EConcatWhere.and,
+                items: [
+                    { column: Columns.payments.date, object: String(moment(toDate).format("YYYY-MM-DD")) }]
+            })
+
             if (sectorId) {
                 filters.push({
                     mode: EModeWhere.strict,
@@ -63,7 +71,7 @@ export = (injectedStore: typeof StoreType) => {
             colOrigin: Columns.payments.id_provider,
             colJoin: Columns.providers.id_provider,
             tableJoin: Tables.PROVIDERS,
-            tableOrigin: Tables.WORKS
+            tableOrigin: Tables.PAYMENTS
         }
 
         const join2: IJoin = {
@@ -79,7 +87,7 @@ export = (injectedStore: typeof StoreType) => {
             pages = {
                 currentPage: page,
                 cantPerPage: cantPerPage || 10,
-                order: Columns.works.id_work,
+                order: Columns.payments.id_payment,
                 asc: false
             };
             const data = await store.list(Tables.PAYMENTS, [ESelectFunct.all], filters, undefined, pages, [join1, join2]);
@@ -132,37 +140,52 @@ export = (injectedStore: typeof StoreType) => {
         }
     }
 
-    const upsert = async (body: IPayment) => {
+    const upsert = async (body: INewPayment) => {
         const providerData: Array<IProviderData> = await providersController.getProvider(body.id_provider)
         const dniProv = providerData[0].dni
         let lastNumber = 0
         const getLast: Array<{ last: number }> = await store.list(Tables.PAYMENTS, [`MAX(${Columns.payments.number}) as last`])
+
         if (getLast[0].last > 0) {
             lastNumber = Number(getLast[0].last) + 1
+        } else {
+            lastNumber = 1
         }
         const newPayment: IPayment = {
             pv: 1,
             number: lastNumber,
             id_provider: body.id_provider,
             dni: dniProv,
-            month: body.month,
-            year: body.year,
-            amount: body.amount,
+            total: body.total,
             details: body.details,
-            type: body.type,
+            type: "",
             advance: body.advance
         }
 
         const resInsert: INewInsert = await store.insert(Tables.PAYMENTS, newPayment)
         if (resInsert.affectedRows > 0) {
-            return resInsert
+            const periods = body.periods
+            await new Promise((resolve, reject) => {
+                periods.map(async (period, key) => {
+                    period.id_provider = body.id_provider
+                    period.payment_id = resInsert.insertId
+                    await store.insert(Tables.PAYMENT_DETAILS, period)
+                    if (key === periods.length - 1) {
+                        resolve("")
+                    }
+                })
+            })
+            body.date = new Date()
+            const providerData: Array<IProviderData> = await providersController.getProvider(body.id_provider)
+            const dataPdf = await createPDFPayment(newPayment, body.periods, providerData[0])
+            return dataPdf
         } else {
             throw new Error(resInsert.message)
         }
     }
 
-    const remove = async (idWork: number) => {
-        const resInsert: INewInsert = await store.remove(Tables.WORKS, { id_work: idWork })
+    const remove = async (idPayment: number) => {
+        const resInsert: INewInsert = await store.remove(Tables.PAYMENTS, { id_payment: idPayment })
         if (resInsert.affectedRows > 0) {
             return "ok"
         } else {

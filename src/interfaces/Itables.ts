@@ -89,10 +89,17 @@ export interface IPayment {
     number: number,
     id_provider: number,
     dni: string,
-    month: number,
-    year: number,
-    amount: number,
+    total: number,
     details: string,
     type: string,
     advance: boolean
+}
+
+export interface IDetPayments {
+    id?: number,
+    month: number,
+    year: number,
+    amount: number,
+    payment_id: number,
+    id_provider: number
 }

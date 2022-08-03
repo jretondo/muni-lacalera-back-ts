@@ -1,4 +1,4 @@
-import { IProviders, IAmounts, ISectors } from './Itables';
+import { IProviders, IAmounts, ISectors, IPayment, IDetPayments } from './Itables';
 export interface INewPermissions {
     permissions: Array<INewPermission>,
     idUser: number
