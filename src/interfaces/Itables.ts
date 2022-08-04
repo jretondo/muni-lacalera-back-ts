@@ -92,7 +92,9 @@ export interface IPayment {
     total: number,
     details: string,
     type: string,
-    advance: boolean
+    advance: boolean,
+    month: number,
+    year: number
 }
 
 export interface IDetPayments {

@@ -13,6 +13,7 @@ import moment from 'moment';
 import contractsController from '../contracts';
 import providersController from '../providers';
 import { createPDFPayment } from '../../../utils/reportsGenerate/newPayment';
+import fs from 'fs';
 
 export = (injectedStore: typeof StoreType) => {
     let store = injectedStore;
@@ -151,6 +152,9 @@ export = (injectedStore: typeof StoreType) => {
         } else {
             lastNumber = 1
         }
+        const datePayment = moment(body.date).toDate()
+        const monthPayment = datePayment.getMonth() + 1
+        const yearPayment = datePayment.getFullYear()
         const newPayment: IPayment = {
             pv: 1,
             number: lastNumber,
@@ -159,7 +163,9 @@ export = (injectedStore: typeof StoreType) => {
             total: body.total,
             details: body.details,
             type: "",
-            advance: body.advance
+            advance: body.advance,
+            month: monthPayment,
+            year: yearPayment
         }
 
         const resInsert: INewInsert = await store.insert(Tables.PAYMENTS, newPayment)
@@ -178,10 +184,28 @@ export = (injectedStore: typeof StoreType) => {
             body.date = new Date()
             const providerData: Array<IProviderData> = await providersController.getProvider(body.id_provider)
             const dataPdf = await createPDFPayment(newPayment, body.periods, providerData[0])
+
+            setTimeout(() => {
+                fs.unlinkSync(dataPdf.filePath)
+            }, 6000);
+
             return dataPdf
         } else {
             throw new Error(resInsert.message)
         }
+    }
+
+    const rePrintPDFPayment = async (idPayment: number) => {
+        const paymentData: Array<IPayment> = await store.getAnyCol(Tables.PAYMENTS, { id_payment: idPayment })
+        const detPayment: Array<IDetPayments> = await store.getAnyCol(Tables.PAYMENT_DETAILS, { payment_id: idPayment })
+        const providerData: Array<IProviderData> = await providersController.getProvider(paymentData[0].id_provider)
+        const dataPdf = await createPDFPayment(paymentData[0], detPayment, providerData[0])
+
+        setTimeout(() => {
+            fs.unlinkSync(dataPdf.filePath)
+        }, 6000);
+
+        return dataPdf
     }
 
     const remove = async (idPayment: number) => {
@@ -193,26 +217,22 @@ export = (injectedStore: typeof StoreType) => {
         }
     }
 
-    const getUser = async (idProv: number): Promise<Array<IProviders>> => {
+    const summaryPayments = async (fromMonth: number, fromYear: number, toMonth: number, toYear: number, idSector?: string, idProvider?: string) => {
 
-        return await store.getAnyCol(Tables.PROVIDERS, { id_provider: idProv });
-    }
-
-    const summaryWorks = async (fromMonth: number, fromYear: number, toMonth: number, toYear: number, idSector?: string, idProvider?: string) => {
         const filters: Array<IWhereParams> = [
             {
                 mode: EModeWhere.higherEqual,
                 concat: EConcatWhere.and,
                 items: [
-                    { column: Columns.works.month, object: String(fromMonth) },
-                    { column: Columns.works.year, object: String(fromYear) }
+                    { column: Columns.payments.month, object: String(fromMonth) },
+                    { column: Columns.payments.year, object: String(fromYear) }
                 ]
             }, {
                 mode: EModeWhere.lessEqual,
                 concat: EConcatWhere.and,
                 items: [
-                    { column: Columns.works.month, object: String(toMonth) },
-                    { column: Columns.works.year, object: String(toYear) }
+                    { column: Columns.payments.month, object: String(toMonth) },
+                    { column: Columns.payments.year, object: String(toYear) }
                 ]
             }]
 
@@ -234,10 +254,10 @@ export = (injectedStore: typeof StoreType) => {
 
         const join1: IJoin = {
             type: ETypesJoin.none,
-            colOrigin: Columns.works.id_provider,
+            colOrigin: Columns.payments.id_provider,
             colJoin: Columns.providers.id_provider,
             tableJoin: Tables.PROVIDERS,
-            tableOrigin: Tables.WORKS
+            tableOrigin: Tables.PAYMENTS
         }
 
         const join2: IJoin = {
@@ -249,11 +269,11 @@ export = (injectedStore: typeof StoreType) => {
         }
 
         const order: Iorder = {
-            columns: [`${Columns.works.year}`, `${Columns.works.month}`],
+            columns: [`${Columns.payments.year}`, `${Columns.payments.month}`],
             asc: true
         }
 
-        const summaryData = await store.list(Tables.WORKS, [`SUM(${Tables.WORKS}.${Columns.works.hours}) AS totalHours`, `SUM(${Tables.WORKS}.${Columns.works.amount}) AS totalAmount`, `${Columns.works.month}`, `${Columns.works.year}`], filters, [`${Columns.works.month}`, `${Columns.works.year}`], undefined, [join1, join2], order)
+        const summaryData = await store.list(Tables.PAYMENTS, [`SUM(${Tables.PAYMENTS}.${Columns.payments.total}) AS totalAmount`, `${Columns.payments.month}`, `${Columns.payments.year}`], filters, [`${Columns.payments.month}`, `${Columns.payments.year}`], undefined, [join1, join2], order)
 
         return summaryData
     }
@@ -263,7 +283,7 @@ export = (injectedStore: typeof StoreType) => {
         provList,
         upsert,
         remove,
-        getUser,
-        summaryWorks
+        summaryPayments,
+        rePrintPDFPayment
     }
 }

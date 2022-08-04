@@ -1,5 +1,4 @@
 import { IProviderData } from './../../interfaces/Iresponses';
-import { INewPayment } from './../../interfaces/Irequests';
 import fs from 'fs';
 import path from 'path';
 import { Error } from 'tinify/lib/tinify/Error';

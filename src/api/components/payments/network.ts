@@ -74,23 +74,23 @@ const remove = (
         }).catch(next)
 }
 
-const get = (
+const rePrintPDFPayment = (
     req: Request,
     res: Response,
     next: NextFunction
 ) => {
-    Controller.getUser(Number(req.params.id))
-        .then((data) => {
-            success({ req, res, message: data });
+    Controller.rePrintPDFPayment(Number(req.params.id))
+        .then((dataFact) => {
+            file(req, res, dataFact.filePath, 'application/pdf', dataFact.fileName, dataFact);
         }).catch(next)
 }
 
-const summaryWorks = (
+const summaryPayments = (
     req: Request,
     res: Response,
     next: NextFunction
 ) => {
-    Controller.summaryWorks(
+    Controller.summaryPayments(
         Number(req.query.fromMonth),
         Number(req.query.fromYear),
         Number(req.query.toMonth),
@@ -103,9 +103,9 @@ const summaryWorks = (
 }
 
 router
-    .get("/details/:id", secure(EPermissions.payments), get)
+    .get("/reprint/:id", secure(EPermissions.payments), rePrintPDFPayment)
     .get("/provider/:page", secure(EPermissions.payments), provList)
-    .get("/summary", secure(EPermissions.payments), summaryWorks)
+    .get("/summary", secure(EPermissions.payments), summaryPayments)
     .get("/:page", secure(EPermissions.payments), listPagination)
     .get("/", secure(EPermissions.payments), list)
     .post("/", secure(EPermissions.payments), upsert)

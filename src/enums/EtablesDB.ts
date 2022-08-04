@@ -98,7 +98,9 @@ enum Payments {
     details = "details",
     type = "type",
     date = "date",
-    advance = "advance"
+    advance = "advance",
+    month = "month",
+    year = "year"
 }
 
 enum DetPayments {
