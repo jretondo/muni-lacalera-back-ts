@@ -24,6 +24,7 @@ import works from './components/works/network';
 import contracts from './components/contracts/network';
 import payments from './components/payments/network';
 import views from './components/views/network';
+import reports from './components/reports/network';
 export class App {
     app: Application;
     constructor(
@@ -63,6 +64,7 @@ export class App {
         this.app.use("/api/contracts", contracts)
         this.app.use("/api/works", works)
         this.app.use("/api/payments", payments)
+        this.app.use("/api/reports", reports)
         this.app.use("/api/views", views)
         this.app.use(errorTrhow);
     }
