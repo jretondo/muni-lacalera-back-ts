@@ -1,3 +1,4 @@
+import { file } from './../../../network/response';
 import { EPermissions } from './../../../enums/EtablesDB';
 import { Router, NextFunction, Response, Request } from 'express';
 import { success } from '../../../network/response';
@@ -32,6 +33,26 @@ const listPagination = (
     )
         .then((listData: any) => {
             success({ req, res, status: 200, message: listData });
+        }).catch(next)
+};
+
+const listPDF = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    Controller.list(
+        undefined,
+        undefined,
+        String(req.query.query ? req.query.query : ""),
+        String(req.query.sectorId),
+        String(req.query.isProf),
+        String(req.query.isHealthProf),
+        Boolean(req.query.advanceSearch),
+        true
+    )
+        .then((dataPDF: any) => {
+            file(req, res, dataPDF.filePath, 'application/pdf', dataPDF.fileName, dataPDF);
         }).catch(next)
 };
 
@@ -86,6 +107,7 @@ const getDataFiscal = (
 router
     .get("/details/:id", secure(EPermissions.providers), get)
     .get("/fiscal", secure(EPermissions.providers), getDataFiscal)
+    .get("/pdf", secure(EPermissions.providers), listPDF)
     .get("/:page", secure(EPermissions.providers), listPagination)
     .get("/", secure(EPermissions.providers), list)
     .post("/", secure(EPermissions.providers), upsert)

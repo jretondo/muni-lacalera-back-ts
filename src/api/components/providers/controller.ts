@@ -10,11 +10,12 @@ import getPages from '../../../utils/functions/getPages';
 import { AfipClass } from '../../../utils/classes/AfipClass';
 import ContractsController from '../contracts';
 import moment from 'moment';
+import { createProviderListPDF } from '../../../utils/reportsGenerate/providerList';
 
 export = (injectedStore: typeof StoreType) => {
     let store = injectedStore;
 
-    const list = async (page?: number, cantPerPage?: number, item?: string, sectorId?: String, isProf?: String, isHealthProf?: String, advanceSearch?: boolean) => {
+    const list = async (page?: number, cantPerPage?: number, item?: string, sectorId?: String, isProf?: String, isHealthProf?: String, advanceSearch?: boolean, pdfReport?: boolean): Promise<any> => {
         const filters: Array<IWhereParams> | undefined = [];
 
         if (item) {
@@ -88,10 +89,15 @@ export = (injectedStore: typeof StoreType) => {
                 pagesObj
             };
         } else {
-            const data = await store.list(Tables.PROVIDERS, [ESelectFunct.all], filters, undefined, undefined, [join1, join2]);
-            return {
-                data
-            };
+            const data: Array<IProviders> = await store.list(Tables.PROVIDERS, [ESelectFunct.all], filters, undefined, undefined, [join1, join2]);
+            if (pdfReport) {
+                const providerPDF = await createProviderListPDF(data)
+                return providerPDF
+            } else {
+                return {
+                    data
+                };
+            }
         }
     }
 
