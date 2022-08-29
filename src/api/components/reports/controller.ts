@@ -207,7 +207,7 @@ export = (injectedStore: typeof StoreType) => {
                         ]
                     })
 
-                    const data2: Array<IDetPayments> = await store.list(Tables.PAYMENT_DETAILS, [ESelectFunct.all], filters);
+                    const data2: Array<IDetPayments> = await store.list(Tables.PAYMENT_DETAILS, [ESelectFunct.all], filters2);
 
                     newDetails.push({
                         paymentData: item,
