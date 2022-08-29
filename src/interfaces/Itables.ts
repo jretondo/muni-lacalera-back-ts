@@ -103,5 +103,6 @@ export interface IDetPayments {
     year: number,
     amount: number,
     payment_id: number,
-    id_provider: number
+    id_provider: number,
+    advance: boolean
 }

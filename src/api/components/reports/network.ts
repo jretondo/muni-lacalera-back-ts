@@ -1,4 +1,3 @@
-import { file } from './../../../network/response';
 import { EPermissions } from '../../../enums/EtablesDB';
 import { Router, NextFunction, Response, Request } from 'express';
 import { success } from '../../../network/response';
@@ -12,12 +11,13 @@ const pending = (
     next: NextFunction
 ) => {
     Controller.pending(
-        Number(req.query.groupBy),
+        Number(req.query.month),
+        Number(req.query.year),
         Number(req.query.providerId),
         Number(req.query.sectorId)
     )
-        .then(() => {
-            success({ req, res });
+        .then((data) => {
+            success({ req, res, message: data });
         }).catch(next)
 }
 
@@ -27,13 +27,13 @@ const advances = (
     next: NextFunction
 ) => {
     Controller.advances(
-        String(req.query.date),
-        Number(req.query.groupBy),
+        Number(req.query.month),
+        Number(req.query.year),
         Number(req.query.providerId),
         Number(req.query.sectorId)
     )
-        .then(() => {
-            success({ req, res });
+        .then((data) => {
+            success({ req, res, message: data });
         }).catch(next)
 }
 

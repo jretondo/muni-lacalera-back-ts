@@ -1,24 +1,16 @@
-import { INewPayment } from './../../../interfaces/Irequests';
-import { IProviderData } from '../../../interfaces/Iresponses';
-import { IContracts, IDetPayments, IPayment, IWork } from '../../../interfaces/Itables';
-import { IJoin, IWhere } from '../../../interfaces/Ifunctions';
-import { INewInsert } from '../../../interfaces/Iresponses';
+import { IDetPayments } from '../../../interfaces/Itables';
+import { IJoin } from '../../../interfaces/Ifunctions';
 import { IProviders } from '../../../interfaces/Itables';
 import { Ipages, IWhereParams, Iorder } from 'interfaces/Ifunctions';
 import { EConcatWhere, EModeWhere, ESelectFunct, ETypesJoin } from '../../../enums/EfunctMysql';
 import { Tables, Columns } from '../../../enums/EtablesDB';
 import StoreType from '../../../store/mysql';
 import getPages from '../../../utils/functions/getPages';
-import moment from 'moment';
-import contractsController from '../contracts';
-import providersController from '../providers';
-import { createPDFPayment } from '../../../utils/reportsGenerate/newPayment';
-import fs from 'fs';
 
 export = (injectedStore: typeof StoreType) => {
     let store = injectedStore;
 
-    const pending = async (groupBy: number, providerId?: number, sectorId?: number) => {
+    const pending = async (month: number, year: number, providerId?: number, sectorId?: number, page?: number, cantPerPage?: number) => {
         const filters: Array<IWhereParams> | undefined = [];
 
         if (sectorId) {
@@ -38,59 +30,108 @@ export = (injectedStore: typeof StoreType) => {
             })
         }
 
-        console.log('filters :>> ', filters);
-
         const join1: IJoin = {
-            type: ETypesJoin.none,
-            colOrigin: Columns.works.id_provider,
-            colJoin: Columns.providers.id_provider,
-            tableJoin: Tables.PROVIDERS,
-            tableOrigin: Tables.WORKS
-        }
-
-        const join2: IJoin = {
-            type: ETypesJoin.none,
+            type: ETypesJoin.left,
             colOrigin: Columns.providers.sector_id,
             colJoin: Columns.sectors.id,
             tableJoin: Tables.SECTORS,
             tableOrigin: Tables.PROVIDERS
         }
 
-        const join4: IJoin = {
-            type: ETypesJoin.left,
-            colOrigin: Columns.works.id_provider,
-            colJoin: Columns.payments.id_provider,
-            tableJoin: Tables.PAYMENTS,
-            tableOrigin: Tables.WORKS
+        const order: Iorder = {
+            columns: [Columns.providers.name],
+            asc: true
         }
 
-        let group: Array<string> = []
+        let pages: Ipages;
+        let data: Array<IProviders>
+        let pagesObj: any
 
-        if (groupBy === 2) {
-            group.push(`${Tables.PROVIDERS}.${Columns.providers.sector_id}`)
-        } else if (groupBy === 1) {
-            group.push(`${Tables.PROVIDERS}.${Columns.providers.id_provider}`)
+        if (page) {
+            pages = {
+                currentPage: page,
+                cantPerPage: cantPerPage || 10,
+                order: Columns.providers.name,
+                asc: true
+            };
+            data = await store.list(Tables.PROVIDERS, [ESelectFunct.all], filters, undefined, pages, [join1], order);
+            const cant = await store.list(Tables.PROVIDERS, [`COUNT(${ESelectFunct.all}) AS COUNT`], filters, undefined, undefined, [join1], order);
+            pagesObj = await getPages(cant[0].COUNT, 10, Number(page));
+        } else {
+            data = await store.list(Tables.PROVIDERS, [ESelectFunct.all], filters, undefined, undefined, [join1], order);
         }
+        interface newDataProv extends IProviders {
+            totalWork: number,
+            totalPayment: number,
+            difference: number
+        }
+        let newData: Array<newDataProv> = []
+        let totalToPay = 0
 
-        const data = await store.list(Tables.WORKS, [ESelectFunct.all, `SUM(${Tables.WORKS}.${Columns.works.amount}) as totalWorks`, `SUM(DISTINCT ${Tables.PAYMENTS}.${Columns.payments.total}) as totalPayments`], filters, group, undefined, [join1, join2, join4]);
+        return await new Promise((resolve, reject) => {
+            data.map(async (item, key) => {
+                const filter1: Array<IWhereParams> | undefined = [];
+                filter1.push({
+                    mode: EModeWhere.strict,
+                    concat: EConcatWhere.and,
+                    items: [
+                        { column: Columns.works.id_provider, object: String(item.id_provider) },
+                        { column: Columns.works.month, object: String(month) },
+                        { column: Columns.works.year, object: String(year) }
+                    ]
+                })
 
-        console.log('data :>> ', data);
-        return {
-            data
-        };
+                const filter2: Array<IWhereParams> | undefined = [];
+                filter2.push({
+                    mode: EModeWhere.strict,
+                    concat: EConcatWhere.and,
+                    items: [
+                        { column: Columns.payment_details.id_provider, object: String(item.id_provider) },
+                        { column: Columns.payment_details.month, object: String(month) },
+                        { column: Columns.payment_details.year, object: String(year) }
+                    ]
+                })
+                const totalWorkQuery: Array<{
+                    totalWork: number
+                }> = await store.list(Tables.WORKS, [`SUM(${Columns.works.amount}) as totalWork`], filter1)
+                const totalPaymentQuery: Array<{
+                    totalPayment: number
+                }> = await store.list(Tables.PAYMENT_DETAILS, [`SUM(${Columns.payment_details.amount}) as totalPayment`], filter2)
+
+                let workTotal = 0
+                let paymentTotal = 0
+                if ((totalWorkQuery[0].totalWork) > 0) {
+                    workTotal = totalWorkQuery[0].totalWork
+                }
+                if ((totalPaymentQuery[0].totalPayment) > 0) {
+                    paymentTotal = totalPaymentQuery[0].totalPayment
+                }
+
+                const difference = workTotal - paymentTotal
+                newData.push({
+                    ...item,
+                    totalWork: workTotal,
+                    totalPayment: paymentTotal,
+                    difference: difference
+                })
+                totalToPay = totalToPay + difference
+                if (key === data.length - 1) {
+                    resolve({ data: newData, totalToPay, pagesObj })
+                }
+            })
+        })
+
     }
 
-    const advances = async (date: string, groupBy: number, providerId?: number, sectorId?: number) => {
+    const advances = async (month: number, year: number, providerId?: number, sectorId?: number) => {
         const filters: Array<IWhereParams> | undefined = [];
-        const today = new Date(date)
-        const todayMonth = today.getMonth() + 1
-        const todayYear = today.getFullYear()
+
         filters.push({
-            mode: EModeWhere.higher,
+            mode: EModeWhere.higherEqual,
             concat: EConcatWhere.and,
             items: [
-                { column: `${Tables.PAYMENT_DETAILS}.${Columns.payment_details.month}`, object: String(todayMonth) },
-                { column: `${Tables.PAYMENT_DETAILS}.${Columns.payment_details.year}`, object: String(todayYear) }]
+                { column: `${Tables.PAYMENT_DETAILS}.${Columns.payment_details.month}`, object: String(month) },
+                { column: `${Tables.PAYMENT_DETAILS}.${Columns.payment_details.year}`, object: String(year) }]
         })
 
         if (sectorId) {
@@ -112,7 +153,7 @@ export = (injectedStore: typeof StoreType) => {
 
         const join1: IJoin = {
             type: ETypesJoin.none,
-            colOrigin: Columns.payments.id_provider,
+            colOrigin: Columns.payment_details.id_provider,
             colJoin: Columns.providers.id_provider,
             tableJoin: Tables.PROVIDERS,
             tableOrigin: Tables.PAYMENT_DETAILS
@@ -126,22 +167,50 @@ export = (injectedStore: typeof StoreType) => {
             tableOrigin: Tables.PROVIDERS
         }
 
-        let group: Array<string> = [Columns.payment_details.year, Columns.payment_details.month]
-
-        if (groupBy === 1) {
-            group.push(Columns.providers.sector_id)
-        } else if (groupBy === 2) {
-            group.push(Columns.providers.id_provider)
+        const join3: IJoin = {
+            type: ETypesJoin.none,
+            colOrigin: Columns.payment_details.payment_id,
+            colJoin: Columns.payments.id_payment,
+            tableJoin: Tables.PAYMENTS,
+            tableOrigin: Tables.PAYMENT_DETAILS
         }
 
+        let group: Array<string> = [`${Tables.PAYMENTS}.${Columns.payments.id_payment}`]
 
-        const data = await store.list(Tables.PAYMENT_DETAILS, [ESelectFunct.all, `(${Tables.WORKS}.${Columns.payment_details.amount}) as total`], filters, group, undefined, [join1, join2]);
+        const data: Array<IDetPayments> = await store.list(Tables.PAYMENT_DETAILS, [ESelectFunct.all], filters, group, undefined, [join1, join2, join3]);
 
-        console.log('data :>> ', data);
+        interface paymentsTotal {
+            paymentData: IDetPayments,
+            installments: Array<IDetPayments>
+        }
 
-        return {
-            data
-        };
+        let newDetails: Array<paymentsTotal> = []
+        return await new Promise((resolve, reject) => {
+            data.map(async (item, key) => {
+                const filters2: Array<IWhereParams> | undefined = [];
+
+                filters2.push({
+                    mode: EModeWhere.higherEqual,
+                    concat: EConcatWhere.and,
+                    items: [
+                        { column: `${Tables.PAYMENT_DETAILS}.${Columns.payment_details.month}`, object: String(month) },
+                        { column: `${Tables.PAYMENT_DETAILS}.${Columns.payment_details.year}`, object: String(year) },
+                        { column: Columns.payment_details.payment_id, object: String(item.payment_id) }
+                    ]
+                })
+
+                const data2: Array<IDetPayments> = await store.list(Tables.PAYMENT_DETAILS, [ESelectFunct.all], filters);
+
+                newDetails.push({
+                    paymentData: item,
+                    installments: data2
+                })
+                if (key === data.length - 1) {
+                    resolve({ data: newDetails })
+                }
+
+            })
+        })
     }
 
     return {

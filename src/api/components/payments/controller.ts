@@ -175,6 +175,7 @@ export = (injectedStore: typeof StoreType) => {
                 periods.map(async (period, key) => {
                     period.id_provider = body.id_provider
                     period.payment_id = resInsert.insertId
+                    period.advance = body.advance
                     await store.insert(Tables.PAYMENT_DETAILS, period)
                     if (key === periods.length - 1) {
                         resolve("")

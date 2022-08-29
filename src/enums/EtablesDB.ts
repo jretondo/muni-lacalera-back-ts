@@ -109,7 +109,8 @@ enum DetPayments {
     year = "year",
     amount = "amount",
     payment_id = "payment_id",
-    id_provider = "id_provider"
+    id_provider = "id_provider",
+    advance = "advance"
 }
 
 export enum EPermissions {
