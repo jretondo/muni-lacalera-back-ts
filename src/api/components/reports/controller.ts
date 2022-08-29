@@ -201,10 +201,13 @@ export = (injectedStore: typeof StoreType) => {
                         mode: EModeWhere.higherEqual,
                         concat: EConcatWhere.and,
                         items: [
-                            { column: `${Tables.PAYMENT_DETAILS}.${Columns.payment_details.month}`, object: String(month) },
-                            { column: `${Tables.PAYMENT_DETAILS}.${Columns.payment_details.year}`, object: String(year) },
-                            { column: Columns.payment_details.payment_id, object: String(item.payment_id) }
+                            { column: Columns.payment_details.month, object: String(month) },
+                            { column: Columns.payment_details.year, object: String(year) }
                         ]
+                    }, {
+                        mode: EModeWhere.strict,
+                        concat: EConcatWhere.and,
+                        items: [{ column: Columns.payment_details.payment_id, object: String(item.payment_id) }]
                     })
 
                     const data2: Array<IDetPayments> = await store.list(Tables.PAYMENT_DETAILS, [ESelectFunct.all], filters2);
