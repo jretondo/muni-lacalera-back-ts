@@ -1,3 +1,4 @@
+import { IProviders } from './Itables';
 import { EConcatWhere, EModeWhere, ETypesJoin } from "enums/EfunctMysql";
 
 export interface IWhere {
@@ -45,4 +46,8 @@ export interface IJoinMysql {
     columnOrigin: string,
     columnJoin: string
 }
-
+export interface newDataProv extends IProviders {
+    totalWork: number,
+    totalPayment: number | string,
+    difference: number
+}
