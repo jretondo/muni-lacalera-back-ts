@@ -1,6 +1,6 @@
 import { createProviderListExcel } from './../../../utils/reportsGenerate/providerListExcel';
 import { INewProvider } from './../../../interfaces/Irequests';
-import { IJoin } from './../../../interfaces/Ifunctions';
+import { IJoin, Iorder } from './../../../interfaces/Ifunctions';
 import { INewInsert, IProviderData } from './../../../interfaces/Iresponses';
 import { IProviders, IContracts } from './../../../interfaces/Itables';
 import { Ipages, IWhereParams } from 'interfaces/Ifunctions';
@@ -74,6 +74,11 @@ export = (injectedStore: typeof StoreType) => {
             tableOrigin: Tables.PROVIDERS
         }
 
+        const order: Iorder = {
+            columns: [`Nombre`],
+            asc: true
+        }
+
         let pages: Ipages;
         if (page) {
             pages = {
@@ -103,7 +108,7 @@ export = (injectedStore: typeof StoreType) => {
                     `${Tables.PROVIDERS}.${Columns.providers.email} as Email`,
                     `${Tables.PROVIDERS}.${Columns.providers.phone} as Telefóno`,
                     `${Tables.SECTORS}.${Columns.sectors.sector} as Sector`
-                ], filters, undefined, undefined, [join1, join2]);
+                ], filters, undefined, undefined, [join1, join2], order);
             } else {
                 data = await store.list(Tables.PROVIDERS, [ESelectFunct.all], filters, undefined, undefined, [join1, join2]);
             }
