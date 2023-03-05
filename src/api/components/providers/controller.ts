@@ -1,3 +1,4 @@
+import { createProviderListExcel } from './../../../utils/reportsGenerate/providerListExcel';
 import { INewProvider } from './../../../interfaces/Irequests';
 import { IJoin } from './../../../interfaces/Ifunctions';
 import { INewInsert, IProviderData } from './../../../interfaces/Iresponses';
@@ -10,12 +11,12 @@ import getPages from '../../../utils/functions/getPages';
 import { AfipClass } from '../../../utils/classes/AfipClass';
 import ContractsController from '../contracts';
 import moment from 'moment';
-import { createProviderListPDF } from '../../../utils/reportsGenerate/providerList';
+import { createProviderListPDF } from '../../../utils/reportsGenerate/providerListPDF';
 
 export = (injectedStore: typeof StoreType) => {
     let store = injectedStore;
 
-    const list = async (page?: number, cantPerPage?: number, item?: string, sectorId?: String, isProf?: String, isHealthProf?: String, advanceSearch?: boolean, pdfReport?: boolean): Promise<any> => {
+    const list = async (page?: number, cantPerPage?: number, item?: string, sectorId?: String, isProf?: String, isHealthProf?: String, advanceSearch?: boolean, pdfReport?: boolean, excelReport?: boolean): Promise<any> => {
         const filters: Array<IWhereParams> | undefined = [];
 
         if (item) {
@@ -89,10 +90,32 @@ export = (injectedStore: typeof StoreType) => {
                 pagesObj
             };
         } else {
-            const data: Array<IProviders> = await store.list(Tables.PROVIDERS, [ESelectFunct.all], filters, undefined, undefined, [join1, join2]);
+            let data: Array<IProviders>
+            if (excelReport) {
+                data = await store.list(Tables.PROVIDERS, [
+                    `${Tables.PROVIDERS}.${Columns.providers.id_provider} as ID`,
+                    `${Tables.PROVIDERS}.${Columns.providers.name} as Nombre`,
+                    `${Tables.PROVIDERS}.${Columns.providers.dni} as DNI`,
+                    `${Tables.PROVIDERS}.${Columns.providers.cuit} as CUIT`,
+                    `${Tables.PROVIDERS}.${Columns.providers.direction} as Dirección`,
+                    `${Tables.PROVIDERS}.${Columns.providers.category} as 'Cat. Monotributo'`,
+                    `${Tables.PROVIDERS}.${Columns.providers.activity} as Actividad`,
+                    `${Tables.PROVIDERS}.${Columns.providers.email} as Email`,
+                    `${Tables.PROVIDERS}.${Columns.providers.phone} as Telefóno`,
+                    `${Tables.SECTORS}.${Columns.sectors.sector} as Sector`
+                ], filters, undefined, undefined, [join1, join2]);
+            } else {
+                data = await store.list(Tables.PROVIDERS, [ESelectFunct.all], filters, undefined, undefined, [join1, join2]);
+            }
+
+
+
             if (pdfReport) {
                 const providerPDF = await createProviderListPDF(data)
                 return providerPDF
+            } else if (excelReport) {
+                const providerExcel = await createProviderListExcel(data)
+                return providerExcel
             } else {
                 return {
                     data

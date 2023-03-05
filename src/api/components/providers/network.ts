@@ -56,6 +56,27 @@ const listPDF = (
         }).catch(next)
 };
 
+const listExcel = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    Controller.list(
+        undefined,
+        undefined,
+        String(req.query.query ? req.query.query : ""),
+        String(req.query.sectorId),
+        String(req.query.isProf),
+        String(req.query.isHealthProf),
+        Boolean(req.query.advanceSearch),
+        false,
+        true
+    )
+        .then((dataExcel: any) => {
+            file(req, res, dataExcel.filePath, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', dataExcel.fileName, dataExcel);
+        }).catch(next)
+};
+
 const upsert = (
     req: Request,
     res: Response,
@@ -108,6 +129,7 @@ router
     .get("/details/:id", secure(EPermissions.providers), get)
     .get("/fiscal", secure(EPermissions.providers), getDataFiscal)
     .get("/pdf", secure(EPermissions.providers), listPDF)
+    .get("/excel", secure(EPermissions.providers), listExcel)
     .get("/:page", secure(EPermissions.providers), listPagination)
     .get("/", secure(EPermissions.providers), list)
     .post("/", secure(EPermissions.providers), upsert)

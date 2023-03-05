@@ -6,5 +6,5 @@ export const staticFolders = {
     css: path.join(__dirname, "..", "..", "public", "css"),
     images: path.join(__dirname, "..", "..", "public", "images"),
     reportsPdf: path.join(__dirname, "..", "..", "public", "reports", "pdf"),
-    reposrtsExcel: path.join(__dirname, "..", "..", "public", "reports", "excel"),
+    reportsExcel: path.join(__dirname, "..", "..", "public", "reports", "excel"),
 }
